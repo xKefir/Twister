@@ -1,0 +1,5 @@
+name: Twister
+version: '${project.version}'
+main: org.minerail.twister.Twister
+api-version: '1.20'
+authors: [x_Kefir]
