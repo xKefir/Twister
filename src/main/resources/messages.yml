@@ -1,0 +1,61 @@
+Messages:
+  #Types: MINIMESSAGE, LEGACY
+  Input-type: 'LEGACY'
+  prefix:
+    string: '&8[&b&lT&a&lw&6&li&3&ls&d&lt&e&le&c&lr&r&8] &r'
+  Command:
+    without-args:
+      event-not-started: '<prefix>&cNa chwilę obecną nie trwa żadne wydarzenie.'
+      joined: '<prefix>&aDołączono do gry.'
+      game-already-started: '<prefix>&cGra się już rozpoczęła!'
+    help:
+      - '<prefix>&6Ostatni zwyciężca: &3<lastWinner>'
+      - '<prefix>&2/tw start [wielkość pól lub random] [typ bloku] &a- Uruchomienie eventu; Wpisz ponownie aby rozpocząć grę.'
+      - '<prefix>&2/tw stop &a- Zatrzymanie eventu oraz wyrzucenie wszystkich uczesnitków.'
+      - '<prefix>&2/tw tp &a- Teleportacja na arene.'
+      - '<prefix>&2/tw leave &a- Wyjście z eventu.'
+      - '<prefix>&2/tw kick [nick] &a- Wyrzucenie gracza z eventu.'
+      - '<prefix>&2/tw top &a- Wyświetla top 10 graczy.'
+      - '<prefix>&2/tw reload &a- Przeładowuje plugin.'
+    start:
+      first-time-to-sender: '<prefix>&aRozpoczęto wydarzenie. Rozmiar: &c<poolsize> &aTyp: &c<type>'
+      second-time-to-sender: '<prefix>&aGra została rozpoczęta!'
+      second-time-to-sender-error: '<prefix>&cBrak wystarczającej ilości graczy, nie można rozpocząć gry.'
+      first-time-broadcast: '<prefix>&2/tw &aAby dołączyć do gry!'
+      second-time-broadcast: '<prefix>&cGra rozpoczęta, od tej chwili nie będzie można dołączyć.'
+      field-size-too-large: '<prefix>&cMaksymalny rozmiar pól wynosi: &a<poolsize>'
+    stop:
+      to-sender: '<prefix>&cZatrzymano!'
+      to-all-players: '<prefix>&cWydarzenie zostało zatrzymane!'
+    tp:
+      to-sender: '<prefix>&aPrzeteleportowano na arenę.'
+    kick:
+      to-sender: '<prefix>&cWyrzucono gracza <player>'
+      player-is-not-in-game-to-sender: '<prefix>&cPodany gracz &b<player> &cnie uczestniczy w grze.'
+      to-targeted-player: '<prefix>&cZostałeś/aś wyrzucony z gry.'
+    top:
+      List:
+        - '<1>'
+        - '<2>'
+        - '<3>'
+        - '<4>'
+        - '<5>'
+        - '<6>'
+        - '<7>'
+        - '<8>'
+        - '<9>'
+        - '<10>'
+        #Maximum 10 elements
+    reload:
+      success: '<prefix>&aPomyślnie przeładowano konfigurację.'
+      error: '<prefix>&cNie udało się przeładować, zobacz konsolę.'
+  Game:
+    player-lose-broadcast: '<prefix>&cGracz &b<player> &codpada z gry! Pozostało: &e<remainplayers>'
+    player-lose-to-player: '<prefix>&cOdpadasz z gry!'
+    player-win-broadcast: '<prefix>&aGracz &b<player> &awygrywa! Jako jedyny pozostał na arenie.'
+    player-win-to-player: '<prefix>&aWygrywasz wydarzenie! Poczekaj aż organizator wręczy ci nagrodę.'
+    no-one-lost: '<prefix>&aNikt nie odpadł z gry. Pozostało: &e<remainPlayers>'
+    no-one-is-winner: '<prefix>&cGra skończona! &bNikt nie wygrał&c!'
+  Errors:
+    missing-permission: '<prefix>&cBrak uprawnień.'
+    event-cannot-start: '<prefix>&cNie można rozpocząć.'

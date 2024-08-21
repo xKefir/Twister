@@ -1,17 +1,16 @@
 Settings:
   Gui:
     open: false
-    material-for-all: FEATHER
+    materials:
+      random: true
+      custom: FEATHER
   Game:
     subtracted-time-multiplier: 0.8 #Double
-    tick-duration-round: 160 #8 seconds
+    seconds-duration-round: 160 #8 seconds
     max-players: 40
     min-players: 2
     max-field-size: 10
     time-to-player-out: 40 #ticks = 2 seconds
-    #If you want to keep player's inventory while game running, set this to "true"
-    #If "true" this will clear player inventory and give while player is out of game and this feature later affects the player's inventory during the game.
-    keep-player-inventory: true
 
 Arena:
   world: "Your world name"
@@ -27,75 +26,7 @@ Arena:
     x:
     y:
     z:
-    pitch:
-    yaw:
   lose-position:
     x:
     y:
     z:
-    pitch:
-    yaw:
-
-Messages:
-  #Types: MINIMESSAGE, LEGACY
-  Input-type: 'LEGACY'
-  prefix:
-    string: '&8[&b&lT&aw&6i&3s&dt&ee&cr&r&8] &r'
-    show-prefix: true
-  Command:
-    without-args:
-      event-not-started: '&cNa chwilę obecną nie trwa żadne wydarzenie.'
-      event-started: '&aDołączono do gry.'
-      game-already-started: '&cGra się już rozpoczęła!'
-    help:
-      - '&6Ostatni zwyciężca: &3<lastWinner>'
-      - '&2/tw start [wielkość pól lub random] [typ bloku] &a- Uruchomienie eventu; Wpisz ponownie aby rozpocząć grę.'
-      - '&2/tw stop &a- Zatrzymanie eventu oraz wyrzucenie wszystkich uczesnitków.'
-      - '&2/tw tp &a- Teleportacja na arene.'
-      - '&2/tw leave &a- Wyjście z eventu.'
-      - '&2/tw kick [nick] &a- Wyrzucenie gracza z eventu.'
-      - '&2/tw top &a- Wyświetla top 10 graczy.'
-    start:
-      first-time-to-sender: '&aRozpoczęto wydarzenie. Rozmiar: &c<poolSize> &aTyp: &c<type>'
-      second-time-to-sender: '&aGra została rozpoczęta!'
-      second-time-to-sender-error: '&cBrak wystarczającej ilości graczy, nie można rozpocząć gry.'
-      first-time-to-all-players: '&2/tw &aAby dołączyć do gry!'
-      second-time-to-all-players: '&cGra rozpoczęta, od tej chwili nie będzie można dołączyć.'
-    stop:
-      to-sender: '&cZatrzymano!'
-      to-all-players: '&cWydarzenie zostało zatrzymane!'
-    tp:
-      to-sender: '&aPrzeteleportowano na arenę.'
-    kick:
-      to-sender: '&cWyrzucono gracza <player>'
-      player-is-not-in-game-to-sender: '&cPodany gracz &b<player> &cnie uczestniczy w grze.'
-      to-targeted-player: '&cZostałeś/aś wyrzucony z gry.'
-    top:
-      List:
-        - '<1>'
-        - '<2>'
-        - '<3>'
-        - '<4>'
-        - '<5>'
-        - '<6>'
-        - '<7>'
-        - '<8>'
-        - '<9>'
-        - '<10>'
-        #Maximum 10 elements
-    reload:
-      success: '&aPomyślnie przeładowano konfigurację.'
-      error: '&cNie udało się przeładować, zobacz konsolę.'
-  Game:
-    player-lose-to-all-players: '&cGracz &b<player> &codpada z gry! Pozostało: &e<remainPlayers>'
-    player-lose-to-player: '&cOdpadasz z gry!'
-    player-win-to-all-players: '&aGracz &b<player> &awygrywa! Jako jedyny pozostał na arenie.'
-    player-win-to-player: '&aWygrywasz wydarzenie! Poczekaj aż organizator wręczy ci nagrodę.'
-  Errors:
-    missing-permission: '&cBrak uprawnień.'
-    event-cannot-start: '&cNie można rozpocząć.'
-    command-not-exists: '&fNieznane polecenie.'
-    filling-blocks: '&cNie można wypełnić obszaru, sprawdź konfiguracje i upewnij się że pole może być wypełnione.'
-
-
-

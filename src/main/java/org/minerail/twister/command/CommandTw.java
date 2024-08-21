@@ -2,9 +2,18 @@ package org.minerail.twister.command;
 
 
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.minerail.twister.Twister;
 import org.minerail.twister.command.subcommand.*;
+import org.minerail.twister.file.Config.Config;
+import org.minerail.twister.file.Message.MessageKey;
+import org.minerail.twister.file.Message.MessageProvider;
+import org.minerail.twister.game.Game;
+import org.minerail.twister.util.PlayerUtil;
 
 import java.util.List;
 
@@ -31,7 +40,25 @@ public class CommandTw {
        );
     }
     private int execute(CommandSender sender) {
-        return 1;
+        if (Game.canJoin) {
+            Player p = Bukkit.getPlayer(sender.getName());
+            PlayerUtil.playerJoinToGame(p);
+            sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_JOINED,
+                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
+            );
+            return 1;
+        } else if (Game.gameStarted){
+            sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_GAME_ALREADY_STARTED,
+                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
+            );
+            return 1;
+        } else {
+            sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_EVENT_NOT_STARTED,
+                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
+            );
+            return 1;
+        }
+
     }
 }
 

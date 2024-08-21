@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.command.CommandSender;
+import org.minerail.twister.game.Game;
 
 public class Stop implements SubCommand {
     @Override
@@ -13,6 +14,8 @@ public class Stop implements SubCommand {
     }
 
     public int execute(CommandSender sender) {
-        return 0;
+
+        Game.stop();
+        return 1;
     }
 }

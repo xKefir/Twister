@@ -3,6 +3,7 @@ package org.minerail.twister.file;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.minerail.twister.Twister;
 import java.io.File;
 import java.io.IOException;
@@ -37,8 +38,12 @@ public class PlayerData {
     }
 
     public static PlayerData get(Player player) {
-        return PLAYER_DATA_MAP.computeIfAbsent(player.getUniqueId(), uuid -> new PlayerData(player));
+        if (!PLAYER_DATA_MAP.containsKey(player.getUniqueId())) {
+            return new PlayerData(player);
+        }
+        return PLAYER_DATA_MAP.get(player.getUniqueId());
     }
+
 
     public static void remove(Player player) {
         PLAYER_DATA_MAP.remove(player.getUniqueId());
@@ -48,17 +53,20 @@ public class PlayerData {
         return Bukkit.getPlayer(playerUUID);
     }
 
-    public void saveToYamlConfiguration() {
+    public void save() {
         try {
             data.save(playerFile);
-        } catch (IOException e) {
-            Twister.get().getLogger().warning("Could not save player data file: " + e.getMessage());
+        } catch (Exception e) {
+            Twister.get().getLogger().warning(e.getMessage());
         }
+    }
+    public static void saveAll() {
+        PLAYER_DATA_MAP.values().forEach(PlayerData::save);
+        Twister.get().getLogger().info("Saved player data.");
     }
 
     public void setWins(int wins) {
         data.set(getPlayer().getName() + ".wins", Math.max(0, wins));
-        saveToYamlConfiguration();
     }
 
     public int getWins() {
@@ -129,4 +137,30 @@ public class PlayerData {
             return "No player at rank " + rank;
         }
     }
+
+    public void savePlayerInventory(ItemStack[] itemStacks, float exp) {
+        for (int i = 0; i < itemStacks.length; i++) {
+            if (itemStacks[i] != null) {
+                data.set("inventory.slot"+i, itemStacks[i]);
+            }
+        }
+        data.set("level.xp", exp);
+    }
+    public ItemStack[] loadPlayerInventory() {
+        ItemStack[] inv = new ItemStack[41];
+        for (int i = 0; i < inv.length; i++) {
+            if (data.contains("inventory.slot" + i)) {
+                inv[i] = data.getItemStack("inventory.slot" + i);
+            }
+        }
+        return inv;
+    }
+    public float getPlayerXP() {
+        return (float) data.get("level.xp");
+    }
+    public void clearInventoryData() {
+        data.set("inventory", null);
+        data.set("level", null);
+    }
 }
+

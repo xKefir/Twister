@@ -9,12 +9,14 @@ public class Blocks {
     private static YamlConfiguration blocks;
     private static Set<String> keys = new HashSet<>();
     private static Set<String> types = new HashSet<>();
+    private static Set<String> materials = new HashSet<>();
     private static Map<String, String> BLOCKS_KEYS_MAP = new LinkedHashMap<>();
 
     private Blocks() {
         File blocksFile = new File(Twister.get().getDataFolder().toPath() + "/blocks.yml");
         if (blocksFile.exists()) {
             blocks = YamlConfiguration.loadConfiguration(blocksFile);
+            clear();
             getAllTypes();
             for (String type : types) {
                 getTypeElements(type);
@@ -27,20 +29,43 @@ public class Blocks {
     public static void create() {
         new Blocks();
     }
+    private void clear() {
+        keys.clear();
+        types.clear();
+        materials.clear();
+        BLOCKS_KEYS_MAP.clear();
+    }
 
     public static Set<String> getAllTypes() {
-        for (String key : blocks.getKeys(false)) {
-            types.add(key);
+        try {
+            for (String key : blocks.getKeys(false)) {
+                types.add(key);
+            }
+            return types;
+        } catch (Exception e) {
+            Twister.get().getLogger().warning(e.getMessage());
         }
-        return types;
+        return null;
     }
 
     public static Set<String> getTypeElements(String type) {
-        for (String element : blocks.getConfigurationSection(type).getKeys(false)) {
-            keys.add(element);
-            BLOCKS_KEYS_MAP.put(type, element);
+        try {
+            for (String element : blocks.getConfigurationSection(type).getKeys(false)) {
+                keys.add(element);
+                BLOCKS_KEYS_MAP.put(type, element);
+            }
+            return keys;
+        } catch (Exception e) {
+            Twister.get().getLogger().warning(e.getMessage());
         }
-        return keys;
+        return null;
+    }
+    public static Set<String> getMaterialList(String type) {
+        for (String entry : keys) {
+            materials.add(blocks.getString(type + "." + entry));
+
+        }
+        return materials;
     }
     public static Map<String, String> getBlockKeysMap() {
         return BLOCKS_KEYS_MAP;
