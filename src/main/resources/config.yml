@@ -1,16 +1,19 @@
 Settings:
   Gui:
     open: false
-    materials:
-      random: true
-      custom: FEATHER
+    title: "&b&lT&a&lw&6&li&3&ls&d&lt&e&le&c&lr"
+    size: 1
+    SizeSelector:
+      materials:
+        random: false
+        custom: BLUE_STAINED_GLASS_PANE
+        show-amounts: true
+
   Game:
     subtracted-time-multiplier: 0.8 #Double
-    seconds-duration-round: 160 #8 seconds
-    max-players: 40
+    seconds-duration-round: 8
     min-players: 2
     max-field-size: 10
-    time-to-player-out: 40 #ticks = 2 seconds
 
 Arena:
   world: "Your world name"

@@ -5,11 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class Board {
     private static final Random RANDOM = new Random();
@@ -110,5 +106,10 @@ public class Board {
                 }
             }
         }
+    }
+    public void clearVariables() {
+        staticMaterials.clear();
+        this.materials.clear();
+        this.exceptions.clear();
     }
 }

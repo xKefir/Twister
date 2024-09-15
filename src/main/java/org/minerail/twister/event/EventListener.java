@@ -20,9 +20,18 @@ public class EventListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         if (PlayerUtil.playerIsInGame(e.getPlayer())) {
+
             PlayerUtil.playerRemoveFromGame(e.getPlayer());
+
             PlayerData.get(e.getPlayer()).addTotalPlayed(-1);
+
             PlayerData.get(e.getPlayer()).addLoses(-1);
+
+            Twister.get().getServer().broadcast(MessageProvider.get(MessageKey.MESSAGES_COMMAND_LEAVE_BROADCAST,
+                    Placeholder.component("player", Component.text(e.getPlayer().getName())),
+                    Placeholder.component("remainplayers", Component.text(Game.players.size())),
+                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING))
+            ));
         }
     }
     @EventHandler
@@ -30,16 +39,21 @@ public class EventListener implements Listener {
         if (e.getPlayer().getLocation().getY() <= Config.getDouble(ConfigKey.ARENA_POS1_Y) - 1 && Game.gameStarted
                 && PlayerUtil.playerIsInGame(e.getPlayer())) {
             PlayerUtil.playerRemoveFromGame(e.getPlayer());
-            Twister.get().getServer().broadcast(MessageProvider.get(MessageKey.MESSAGES_GAME_PLAYER_LOSE_BROADCAST,
-                    Placeholder.component("player", Component.text(e.getPlayer().getName())),
-                    Placeholder.component("remainplayers", Component.text(Game.players.size())),
-                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING))
-                    ));
+
             e.getPlayer().teleport(LocationUtil.serializeLocation(
                     Config.getDouble(ConfigKey.ARENA_LOSE_POS_X),
                     Config.getDouble(ConfigKey.ARENA_LOSE_POS_Y),
                     Config.getDouble(ConfigKey.ARENA_LOSE_POS_Z),
                     Config.getString(ConfigKey.ARENA_WORLD)
+            ));
+
+            e.getPlayer().sendMessage(MessageProvider.get(MessageKey.MESSAGES_GAME_PLAYER_LOSE_TO_PLAYER,
+                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING))));
+
+            Twister.get().getServer().broadcast(MessageProvider.get(MessageKey.MESSAGES_GAME_PLAYER_LOSE_BROADCAST,
+                    Placeholder.component("player", Component.text(e.getPlayer().getName())),
+                    Placeholder.component("remainplayers", Component.text(Game.players.size())),
+                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING))
             ));
         }
     }

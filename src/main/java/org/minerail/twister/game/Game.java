@@ -1,5 +1,8 @@
 package org.minerail.twister.game;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -7,6 +10,8 @@ import org.minerail.twister.Twister;
 import org.minerail.twister.file.Blocks;
 import org.minerail.twister.file.Config.Config;
 import org.minerail.twister.file.Config.ConfigKey;
+import org.minerail.twister.file.Message.MessageKey;
+import org.minerail.twister.file.Message.MessageProvider;
 import org.minerail.twister.util.LocationUtil;
 import org.minerail.twister.util.PlayerUtil;
 
@@ -51,76 +56,96 @@ public class Game {
         canJoin = false;
 
         task = new BukkitRunnable() {
-            private double roundTime = time;
+            private double roundTime = time * 1000;
             private long roundStartTime = System.currentTimeMillis();
             private double incrementPerRound = 0.06;
             private double decrement = roundTime * (multiplier / 100);
-            private long lastClearAreaTime = System.currentTimeMillis();
             private boolean areaFilled = false;
             private boolean materialIsSelected = false;
             private Material randomMaterial;
+            private int remainingPlayers = players.size();
+            private long lastClearAreaTime = 0;
+            private long xpBarStartTime;
+            private double xpBarDuration;
+
             @Override
             public void run() {
                 long currentTime = System.currentTimeMillis();
                 long elapsedTime = currentTime - roundStartTime;
 
+                if (players.size() <= 1) {
+                    if ((currentTime - lastClearAreaTime) >= 1500) {
+                        gameIsEnded = true;
+                        fillArea();
+                    }
+                }
+
                 if (!materialIsSelected) {
                     randomMaterial = Board.getRandomMaterial();
-                    if (elapsedTime >= roundTime * 0.25) {
+                    if (elapsedTime >= (roundTime + 2000) * 0.35 && areaFilled) {
                         PlayerUtil.preparePlayersInventory(randomMaterial);
                         materialIsSelected = true;
+
+                        xpBarStartTime = currentTime;
+                        xpBarDuration = roundTime - elapsedTime;
                     }
                 }
 
-                if (players.size() <= 1) {
-                    gameIsEnded = true;
-                    fillArea();
+                if (materialIsSelected) {
+                    long xpElapsedTime = currentTime - xpBarStartTime;
+                    double xpProgress = Math.max(0, (xpBarDuration - xpElapsedTime) / xpBarDuration);
+                    int remainingSeconds = (int) Math.ceil((xpBarDuration - xpElapsedTime) / 1000);
+
+                    PlayerUtil.changePlayersXPBar(xpProgress, remainingSeconds);
                 }
 
-                if (elapsedTime >= roundTime * 1000) {
+                if (elapsedTime >= roundTime) {
                     if (materialIsSelected) {
                         Game.clearArea(randomMaterial);
+                        PlayerUtil.clearInventories();
+                        lastClearAreaTime = currentTime;
+                        areaFilled = false;
                         materialIsSelected = false;
+                        PlayerUtil.changePlayersXPBar(1.0, 0);
                     }
-
                     roundTime -= decrement;
                     decrement += incrementPerRound;
-
                     if (roundTime < 1) {
                         roundTime = 1;
                     }
 
-                    areaFilled = false;
-                    lastClearAreaTime = currentTime;
                     roundStartTime = currentTime;
-
                 }
-
-                long fillAreaElapsedTime = currentTime - lastClearAreaTime;
-
-                if (!areaFilled && fillAreaElapsedTime >= (roundTime * 1000) / 2) {
+                if (!areaFilled && (currentTime - lastClearAreaTime) >= 2000) {
                     Game.fillArea();
                     areaFilled = true;
+                    if (remainingPlayers == players.size()) {
+                        Bukkit.broadcast(MessageProvider.get(MessageKey.MESSAGES_GAME_NO_ONE_LOST,
+                                Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)),
+                                Placeholder.component("remainplayers", Component.text(players.size()))));
+                    }
                 }
 
-                if (gameIsEnded && fillAreaElapsedTime >= 2000) {
+                if (gameIsEnded) {
                     PlayerUtil.getWinner();
+                    new Board(pos1, pos2, fieldArea, type1).clearVariables();
+                    stop();
                 }
-
             }
         };
+
         task.runTaskTimer(Twister.get(), 0, 1);
-
-
-
     }
+
+
     public static void stop() {
         if (task != null) {
             task.cancel();
         }
         gameStarted = false;
         canJoin = false;
-        players.clear();
+        gameIsEnded = false;
+        PlayerUtil.kickAllPlayers();
     }
 
     private static void fillArea() {

@@ -1,7 +1,11 @@
 package org.minerail.twister.file;
 
+import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.minerail.twister.Twister;
+import org.minerail.twister.util.TextFormatUtil;
+
 import java.io.File;
 import java.util.*;
 
@@ -50,7 +54,7 @@ public class Blocks {
 
     public static Set<String> getTypeElements(String type) {
         try {
-            for (String element : blocks.getConfigurationSection(type).getKeys(false)) {
+            for (String element : blocks.getConfigurationSection(type + ".elements").getKeys(false)) {
                 keys.add(element);
                 BLOCKS_KEYS_MAP.put(type, element);
             }
@@ -62,8 +66,7 @@ public class Blocks {
     }
     public static Set<String> getMaterialList(String type) {
         for (String entry : keys) {
-            materials.add(blocks.getString(type + "." + entry));
-
+            materials.add(blocks.getString(type + ".elements." + entry));
         }
         return materials;
     }
@@ -71,5 +74,14 @@ public class Blocks {
         return BLOCKS_KEYS_MAP;
     }
 
+    public static Material getMaterialFromSettings(String type) {
+        return Material.valueOf(blocks.getString(type + ".type-display.material"));
+    }
 
+    public static Component getItemNameFromSettings(String type) {
+        return TextFormatUtil.format(blocks.getString(type + ".type-display.name"));
+    }
+    public static List<Component> getItemLoreFromSettings(String type) {
+        return TextFormatUtil.format(blocks.getStringList(type + ".type-display.lore"));
+    }
 }

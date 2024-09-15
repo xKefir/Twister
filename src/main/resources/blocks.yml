@@ -1,29 +1,37 @@
 Welna:
-  Bialy: WHITE_WOOL
-  Jasno-szary: LIGHT_GRAY_WOOL
-  Szary: GRAY_WOOl
-  Czarny: BLACK_WOOL
-  Brazowy: BROWN_WOOL
-  Czerwony: RED_WOOL
-  Pomaranczowy: ORANGE_WOOL
-  Zolty: YELLOW_WOOL
-  Jasno-zielony: LIME_WOOL
-  Zielony: GREEN_WOOL
-  Blekitny: CYAN_WOOL
-  Jasno-niebieski: LIGHT_BLUE_WOOL
-  Niebieski: BLUE_WOOL
-  Fioletowy: PURPLE_WOOL
-  Karmazynowy: MAGENTA_WOOL
-  Rozowy: PINK_WOOL
+  type-display:
+    material: PURPLE_WOOL
+    name: "&e&lWełna"
+    lore: []
+  elements:
+    Bialy: WHITE_WOOL
+    Jasno-szary: LIGHT_GRAY_WOOL
+    Szary: GRAY_WOOl
+    Czarny: BLACK_WOOL
+    Brazowy: BROWN_WOOL
+    Czerwony: RED_WOOL
+    Pomaranczowy: ORANGE_WOOL
+    Zolty: YELLOW_WOOL
+    Jasno-zielony: LIME_WOOL
+    Zielony: GREEN_WOOL
+    Blekitny: CYAN_WOOL
+    Jasno-niebieski: LIGHT_BLUE_WOOL
+    Niebieski: BLUE_WOOL
+    Fioletowy: PURPLE_WOOL
+    Karmazynowy: MAGENTA_WOOL
+    Rozowy: PINK_WOOL
 Terracotta:
-
+  elements:
 Drewno:
-
+  elements:
 Szklo:
-
+  elements:
 Rudy:
-  Kamien: STONE
+  elements:
+    Kamien: STONE
 
 Beton:
+  elements:
 
 GlazurTerracotta:
+  elements:

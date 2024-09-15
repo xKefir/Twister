@@ -14,10 +14,8 @@ public class Reload implements SubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> get() {
         return Commands.literal("reload")
-                .executes(ctx -> execute(ctx.getSource().getSender()))
-                .requires(ctx ->
-                        ctx.getSender().hasPermission("tw.use")
-                );
+                .requires(ctx -> ctx.getSender().hasPermission("tw.use"))
+                .executes(ctx -> execute(ctx.getSource().getSender()));
     }
 
 

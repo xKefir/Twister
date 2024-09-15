@@ -9,10 +9,16 @@ public class Top implements SubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> get() {
         return Commands.literal("top")
+                .requires(ctx -> ctx.getSender().hasPermission("tw.use"))
                 .executes(ctx -> execute(ctx.getSource().getSender()));
     }
 
     public int execute(CommandSender sender) {
-        return 0;
+
+        for (int i = 1; i <= 10; i++) {
+
+        }
+
+        return 1;
     }
 }
