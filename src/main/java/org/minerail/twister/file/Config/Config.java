@@ -14,7 +14,6 @@ public class Config {
             Twister.get().saveResource("config.yml", false);
         }
         config = YamlConfiguration.loadConfiguration(msg1);
-
     }
 
     public static String getString(ConfigKey key) {
@@ -28,7 +27,9 @@ public class Config {
         return config.getDouble(key.getPath());
     }
 
-    public static boolean getBoolean(ConfigKey key) { return config.getBoolean(key.getPath()); }
+    public static boolean getBoolean(ConfigKey key) {
+        return config.getBoolean(key.getPath());
+    }
 
 
 }

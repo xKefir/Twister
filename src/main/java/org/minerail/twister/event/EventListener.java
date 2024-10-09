@@ -11,7 +11,6 @@ import org.minerail.twister.file.Config.Config;
 import org.minerail.twister.file.Config.ConfigKey;
 import org.minerail.twister.file.Message.MessageKey;
 import org.minerail.twister.file.Message.MessageProvider;
-import org.minerail.twister.file.PlayerData;
 import org.minerail.twister.game.Game;
 import org.minerail.twister.util.LocationUtil;
 import org.minerail.twister.util.PlayerUtil;
@@ -22,11 +21,7 @@ public class EventListener implements Listener {
         if (PlayerUtil.playerIsInGame(e.getPlayer())) {
 
             PlayerUtil.playerRemoveFromGame(e.getPlayer());
-
-            PlayerData.get(e.getPlayer()).addTotalPlayed(-1);
-
-            PlayerData.get(e.getPlayer()).addLoses(-1);
-
+            PlayerUtil.changeStats(e.getPlayer(), "quit");
             Twister.get().getServer().broadcast(MessageProvider.get(MessageKey.MESSAGES_COMMAND_LEAVE_BROADCAST,
                     Placeholder.component("player", Component.text(e.getPlayer().getName())),
                     Placeholder.component("remainplayers", Component.text(Game.players.size())),
@@ -39,6 +34,7 @@ public class EventListener implements Listener {
         if (e.getPlayer().getLocation().getY() <= Config.getDouble(ConfigKey.ARENA_POS1_Y) - 1 && Game.gameStarted
                 && PlayerUtil.playerIsInGame(e.getPlayer())) {
             PlayerUtil.playerRemoveFromGame(e.getPlayer());
+            PlayerUtil.changeStats(e.getPlayer(), "lose");
 
             e.getPlayer().teleport(LocationUtil.serializeLocation(
                     Config.getDouble(ConfigKey.ARENA_LOSE_POS_X),

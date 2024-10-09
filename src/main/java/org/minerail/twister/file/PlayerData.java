@@ -53,10 +53,6 @@ public class PlayerData {
     }
 
 
-    public static void remove(Player player) {
-        PLAYER_DATA_MAP.remove(player.getUniqueId());
-    }
-
     public Player getPlayer() {
         return Bukkit.getPlayer(playerUUID);
     }
@@ -132,7 +128,7 @@ public class PlayerData {
     // STATISTICS
 
     public void setWins(int wins) {
-        data.set("statistics.wins", Math.max(0, wins));
+        data.set("statistics.wins", wins);
     }
 
     public int getWins() {
@@ -144,11 +140,11 @@ public class PlayerData {
     }
 
     public void setLoses(int loses) {
-        data.set("statistics.loses", Math.max(0, loses));
+        data.set("statistics.loses", loses);
     }
 
     public int getLoses() {
-        return data.getInt("statistics.loses", 0);
+        return data.getInt("statistics.loses");
     }
 
     public void addLoses(int loses) {
@@ -156,11 +152,11 @@ public class PlayerData {
     }
 
     public void setTotalPlayed(int totalPlayed) {
-        data.set("statistics.totalPlayed", Math.max(0, totalPlayed));
+        data.set("statistics.totalPlayed", totalPlayed);
     }
 
     public int getTotalPlayed() {
-        return data.getInt("statistics.totalPlayed", 0);
+        return data.getInt("statistics.totalPlayed");
     }
 
     public void addTotalPlayed(int totalPlayed) {
@@ -201,7 +197,7 @@ public class PlayerData {
                 int wins = playerData.getWins();
                 playerScores.put(playerData.getPlayer().getName(), wins);
             } catch (IllegalArgumentException e) {
-                continue;
+
             }
         }
 

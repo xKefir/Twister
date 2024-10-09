@@ -17,7 +17,7 @@ public enum MessageKey {
     MESSAGES_COMMAND_START_FIRST_TIME_TO_SENDER("Messages.Command.start.first-time-to-sender"),
     MESSAGES_COMMAND_START_SECOND_TIME_TO_SENDER("Messages.Command.start.second-time-to-sender"),
     MESSAGES_COMMAND_START_SECOND_TIME_TO_SENDER_ERROR("Messages.Command.start.second-time-to-sender-error"),
-    MESSAGES_COMMAND_START_FIRT_TIME_BROADCAST("Messages.Command.start.first-time-broadcast"),
+    MESSAGES_COMMAND_START_FIRST_TIME_BROADCAST("Messages.Command.start.first-time-broadcast"),
     MESSAGES_COMMAND_START_SECOND_TIME_BROADCAST("Messages.Command.start.second-time-broadcast"),
     MESSAGES_COMMAND_START_FIELD_SIZE_TOO_LARGE("Messages.Command.start.field-size-too-large"),
 

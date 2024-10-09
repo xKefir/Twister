@@ -15,7 +15,6 @@ import org.minerail.twister.file.Message.MessageProvider;
 import org.minerail.twister.file.Config.ConfigKey;
 import org.minerail.twister.file.Message.MessageKey;
 import org.minerail.twister.game.Game;
-import org.minerail.twister.gui.SizeSelector;
 import org.minerail.twister.gui.TypeSelector;
 
 
@@ -60,30 +59,45 @@ public class Start implements SubCommand {
     public int execute(CommandSender sender, int i, String type) throws InterruptedException {
         if (Config.getBoolean(ConfigKey.SETTINGS_GUI_MODULE_ENABLED) && num != 1) {
             new TypeSelector(Bukkit.getPlayer(sender.getName()));
+            executor = sender.getName();
             return 1;
         }
         if (i != -1 && num != 1) {
-            if (i <= Config.getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE)) {
-                Game.runlLobby(i, type);
-                num = 1;
-                sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_FIRST_TIME_TO_SENDER,
-                        Placeholder.component("poolsize", Component.text(i)),
-                        Placeholder.component("type", Component.text(type)),
-                        Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
-                );
-                Bukkit.broadcast(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_FIRT_TIME_BROADCAST,
-                        Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
-                );
-                executor = sender.getName();
-                return 1;
-            } else {
-                sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_FIELD_SIZE_TOO_LARGE,
-                        Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)),
-                        Placeholder.component("poolsize", Component.text(Config.getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE)))));
-            }
+            firstTime(sender, i, type);
             return 1;
         } else if (num == 1) {
-            if (sender.getName().equals(executor)) {
+            secondTime(sender);
+            return 1;
+        } else {
+            sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_ERRORS_EVENT_CANNOT_START,
+                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
+            );
+            return 1;
+        }
+    }
+
+    private void firstTime(CommandSender sender, int i, String type) {
+        if (i <= Config.getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE)) {
+            Game.runLobby(i, type);
+            num = 1;
+            sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_FIRST_TIME_TO_SENDER,
+                    Placeholder.component("poolsize", Component.text(i)),
+                    Placeholder.component("type", Component.text(type)),
+                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
+            );
+            Bukkit.broadcast(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_FIRST_TIME_BROADCAST,
+                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
+            );
+            executor = sender.getName();
+        } else {
+            sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_FIELD_SIZE_TOO_LARGE,
+                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)),
+                    Placeholder.component("poolsize", Component.text(Config.getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE)))));
+        }
+    }
+
+    private void secondTime(CommandSender sender) {
+        if (sender.getName().equals(executor)) {
                 if (Game.players.size() >= Config.getInt(ConfigKey.SETTINGS_GAME_MIN_PLAYERS)) {
                     Game.runGame();
                     num++;
@@ -93,28 +107,17 @@ public class Start implements SubCommand {
                     Bukkit.broadcast(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_SECOND_TIME_BROADCAST,
                             Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
                     );
-                    SizeSelector.lobbyCanRun = false;
+                    Game.lobbyIsOpen = false;
                     num = 0;
-                    return 1;
                 } else {
                     sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_SECOND_TIME_TO_SENDER_ERROR,
                             Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
                     );
-                    return 1;
                 }
             } else {
                 sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_ERRORS_EVENT_CANNOT_START,
                         Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING))));
-                return 1;
             }
-        } else {
-            sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_ERRORS_EVENT_CANNOT_START,
-                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
-            );
-            return 1;
-        }
     }
-
-
 }
 

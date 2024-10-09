@@ -70,9 +70,6 @@ public class Blocks {
         }
         return materials;
     }
-    public static Map<String, String> getBlockKeysMap() {
-        return BLOCKS_KEYS_MAP;
-    }
 
     public static Material getMaterialFromSettings(String type) {
         return Material.valueOf(blocks.getString(type + ".type-display.material"));

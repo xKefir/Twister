@@ -5,9 +5,8 @@ public enum ConfigKey {
     SETTINGS_GUI_MODULE_ENABLED("Settings.Gui.open"),
     SETTINGS_GUI_TITLE("Settings.Gui.title"),
     SETTINGS_GUI_SIZE("Settings.Gui.size"),
-    SETTINGS_GUI_SIZESELECTOR_MATERIALS_RANDOM("Settings.Gui.SizeSelector.materials.random"),
-    SETTINGS_GUI_SIZESELECTOR_MATERIALS_CUSTOM("Settings.Gui.SizeSelector.materials.custom"),
-    SETTINGS_GUI_SIZESELECTOR_MATERIALS_SHOW_AMOUNTS("Settings.Gui.SizeSelector.materials.show-amounts"),
+    SETTINGS_GUI_SIZESELECTOR_ITEMS_TYPE("Settings.Gui.SizeSelector.items.type"),
+    SETTINGS_GUI_SIZESELECTOR_ITEMS_SHOW_AMOUNTS("Settings.Gui.SizeSelector.items.show-amounts"),
 
     SETTINGS_GAME_SUBTRACTED_TIME_MULTIPLIER("Settings.Game.subtracted-time-multiplier"),
     SETTINGS_GAME_SECONDS_DURATION_ROUND("Settings.Game.seconds-duration-round"),

@@ -20,7 +20,6 @@ public class Board {
     private final int y;
     private final int fieldSize;
     private final List<Material> materials;
-    private final Set<Material> exceptions = new HashSet<>();
 
     public Board(Location loc1, Location loc2, int fieldSize, Set<String> materialKeys) {
         new CoordinateAdjuster(loc1, loc2);
@@ -87,7 +86,7 @@ public class Board {
         for (int x = x1; x <= x2; x++) {
             for (int z = z1; z <= z2; z++) {
                 Block block = world.getBlockAt(x, y, z);
-                if (block.getType() != materialToKeep && !exceptions.contains(block.getType())) {
+                if (block.getType() != materialToKeep) {
                     block.setType(Material.AIR);
                 }
             }
@@ -101,15 +100,12 @@ public class Board {
         for (int x = x1; x <= x2; x++) {
             for (int z = z1; z <= z2; z++) {
                 Block block = world.getBlockAt(x, y, z);
-                if (!exceptions.contains(block.getType())) {
-                    block.setType(Material.AIR);
-                }
+                block.setType(Material.AIR);
             }
         }
     }
     public void clearVariables() {
         staticMaterials.clear();
         this.materials.clear();
-        this.exceptions.clear();
     }
 }

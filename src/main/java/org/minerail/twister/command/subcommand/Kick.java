@@ -23,7 +23,7 @@ public class Kick implements SubCommand {
                 .requires(ctx -> ctx.getSender().hasPermission("tw.admin"))
                 .then(argument("target", StringArgumentType.string())
                         .suggests((context, builder) -> {
-                            Game.players.forEach(builder::suggest);
+                            Game.players.forEach(player -> builder.suggest(player.getName()));
                             return builder.buildFuture();
                         })
                         .executes(ctx -> {

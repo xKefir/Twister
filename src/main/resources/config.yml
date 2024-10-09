@@ -4,13 +4,12 @@ Settings:
     title: "&b&lT&a&lw&6&li&3&ls&d&lt&e&le&c&lr"
     size: 1
     SizeSelector:
-      materials:
-        random: false
-        custom: BLUE_STAINED_GLASS_PANE
+      items:
+        type: BLUE_STAINED_GLASS_PANE
         show-amounts: true
 
   Game:
-    subtracted-time-multiplier: 0.8 #Double
+    subtracted-time-multiplier: 0.8
     seconds-duration-round: 8
     min-players: 2
     max-field-size: 10

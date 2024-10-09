@@ -11,6 +11,7 @@ import org.minerail.twister.file.Blocks;
 import org.minerail.twister.file.Config.Config;
 import org.minerail.twister.file.Message.MessageProviderLoader;
 import org.minerail.twister.file.PlayerData;
+import org.minerail.twister.task.PlayerDataSaveTask;
 
 
 public final class Twister extends JavaPlugin {
@@ -29,13 +30,8 @@ public final class Twister extends JavaPlugin {
         savePlayerData();
     }
     private void savePlayerData() {
-        BukkitRunnable task = new BukkitRunnable() {
-            @Override
-            public void run() {
-                PlayerData.saveAll();
-            }
-        };
-        task.runTaskLaterAsynchronously(this, 72000L);
+        PlayerDataSaveTask saveTask = new PlayerDataSaveTask();
+        saveTask.start(72000L);
     }
     public static void reloadAll() {
         Config.reload();

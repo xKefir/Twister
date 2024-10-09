@@ -1,6 +1,7 @@
 package org.minerail.twister.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -17,10 +18,9 @@ public class TextFormatUtil {
         if (MessageProviderLoader.getString(MessageKey.MESSAGES_INPUT_TYPE.getPath()).equals("LEGACY")) {
             return LegacyComponentSerializer.legacyAmpersand().deserialize(
                     LegacyComponentSerializer.legacyAmpersand().serialize(
-                            MiniMessage.builder().build().deserialize(input, resolvers))
-            );
+                            MiniMessage.builder().build().deserialize(input, resolvers))).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
         }
-        return MiniMessage.miniMessage().deserialize(input, resolvers);
+        return MiniMessage.miniMessage().deserialize(input, resolvers).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
     }
     public static List<Component> format(List<String> input, TagResolver... resolvers) {
         List<Component> formattedComponent = new ArrayList<>();
@@ -31,15 +31,5 @@ public class TextFormatUtil {
         return formattedComponent;
     }
 
-    public static List<String> serialize(List<Component> input) {
-        List<String> serializedText = new ArrayList<>();
-        for (Component text : input) {
-            serializedText.add(serialize(text));
-        }
-        return serializedText;
-    }
 
-    public static String serialize(Component input) {
-        return GsonComponentSerializer.gson().serialize(input);
-    }
 }

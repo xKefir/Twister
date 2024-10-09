@@ -12,7 +12,6 @@ import org.minerail.twister.file.Message.MessageProviderLoader;
 import org.minerail.twister.util.PlayerUtil;
 
 import java.util.List;
-import java.util.Set;
 
 public class Help implements SubCommand {
     private String replacer;
@@ -24,10 +23,10 @@ public class Help implements SubCommand {
     }
     public int execute(CommandSender sender) {
         List<Component> messages;
-        if (PlayerUtil.winner == null) {
+        if (PlayerUtil.w == null) {
             replacer = MessageProviderLoader.getString(MessageKey.MESSAGES_CONSTANTS_LAST_WINNER.getPath());
         } else {
-            replacer = PlayerUtil.winner;
+            replacer = PlayerUtil.w.getName();
         }
             messages = MessageProvider.getList(MessageKey.MESSAGES_COMMAND_HELP,
                     Placeholder.component("lastwinner", Component.text(replacer)),

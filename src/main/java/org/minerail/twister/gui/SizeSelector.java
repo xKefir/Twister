@@ -15,13 +15,13 @@ import org.minerail.twister.file.Config.ConfigKey;
 import org.minerail.twister.file.Message.MessageKey;
 import org.minerail.twister.file.Message.MessageProvider;
 import org.minerail.twister.game.Game;
+import org.minerail.twister.util.PlayerUtil;
 import org.minerail.twister.util.TextFormatUtil;
 
 public class SizeSelector {
 
     private Gui gui;
     private String type;
-    public static boolean lobbyCanRun = false;
 
     public SizeSelector(String type,Player p) {
         createGui();
@@ -41,21 +41,22 @@ public class SizeSelector {
     private void createItems() {
         for (int i = 1; i <= Config.getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE); i++) {
             int size = i;
-            GuiItem item = ItemBuilder.from(new ItemStack(Material.valueOf(Config.getString(ConfigKey.SETTINGS_GUI_SIZESELECTOR_MATERIALS_CUSTOM)), i))
+            GuiItem item = ItemBuilder.from(new ItemStack(Material.valueOf(Config.getString(ConfigKey.SETTINGS_GUI_SIZESELECTOR_ITEMS_TYPE)), i))
                     .name(TextFormatUtil.format("&e&l" + i))
-                    .amount(Config.getBoolean(ConfigKey.SETTINGS_GUI_SIZESELECTOR_MATERIALS_SHOW_AMOUNTS) ? i : 1)
+                    .amount(Config.getBoolean(ConfigKey.SETTINGS_GUI_SIZESELECTOR_ITEMS_SHOW_AMOUNTS) ? i : 1)
                     .asGuiItem(event -> {
-                        Game.runlLobby(size, type);
-                        lobbyCanRun = true;
+                        Game.runLobby(size, type);
+                        Game.lobbyIsOpen = true;
                         Start.num++;
                         Start.executor = event.getWhoClicked().getName();
+                        PlayerUtil.playerJoinToGame((Player) event.getWhoClicked());
                         gui.close(event.getWhoClicked());
                         event.getWhoClicked().sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_FIRST_TIME_TO_SENDER,
                                 Placeholder.component("poolsize", Component.text(size)),
                                 Placeholder.component("type", Component.text(type)),
                                 Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
                         );
-                        Bukkit.broadcast(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_FIRT_TIME_BROADCAST,
+                        Bukkit.broadcast(MessageProvider.get(MessageKey.MESSAGES_COMMAND_START_FIRST_TIME_BROADCAST,
                                 Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
                         );
                     });
