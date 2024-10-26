@@ -64,6 +64,7 @@ public class PlayerData {
             Twister.get().getLogger().warning(e.getMessage());
         }
     }
+
     public static void saveAll() {
         PLAYER_DATA_MAP.values().forEach(PlayerData::save);
         Twister.get().getLogger().info("Saved player data.");
@@ -93,9 +94,11 @@ public class PlayerData {
         }
         return inv;
     }
+
     public float getXP() {
         return (float) data.getDouble("inventory.experience.amount");
     }
+
     public int getLevel() {
         return data.getInt("inventory.experience.level");
     }
@@ -116,6 +119,7 @@ public class PlayerData {
         data.set("last-location.z", z);
         data.set("last-location.world", world.getName());
     }
+
     public Location getPlayerJoinLocationFromData() {
         return LocationUtil.serializeLocation(
                 data.getDouble("last-location.x"),
@@ -168,50 +172,41 @@ public class PlayerData {
         setLoses(0);
         setTotalPlayed(0);
     }
+}
+class PlayerStatistics {
+    private static Map<String, Integer> cachedData = new HashMap<>();
 
-    public static List<Map.Entry<String, Integer>> getTop10Players() {
-        File playerDataFolder = new File("plugins/Twister/PlayerData");
-        if (!playerDataFolder.exists() || !playerDataFolder.isDirectory()) {
-            return Collections.emptyList();
-        }
 
-        File[] playerFiles = playerDataFolder.listFiles((dir, name) -> name.endsWith(".yml"));
-        if (playerFiles == null) {
-            return Collections.emptyList();
-        }
-
-        Map<String, Integer> playerScores = new HashMap<>();
-
-        for (File file : playerFiles) {
-            try {
-                UUID playerUUID = UUID.fromString(file.getName().replace(".yml", ""));
-                PlayerData playerData = PLAYER_DATA_MAP.get(playerUUID);
-                if (playerData == null) {
-                    Player player = Bukkit.getPlayer(playerUUID);
-                    if (player == null) {
-                        continue;
-                    }
-                    playerData = new PlayerData(player);
-                }
-
-                int wins = playerData.getWins();
-                playerScores.put(playerData.getPlayer().getName(), wins);
-            } catch (IllegalArgumentException e) {
-
+    public static Map<String, Integer> getTop10Players(String type) {
+        switch (type) {
+            case "wins" -> {
+                return findBy("statistics.wins");
+            }
+            case "total" -> {
+                return findBy("statistics.totalPlayed");
+            }
+            case "loses" -> {
+                return findBy("statistics.loses");
             }
         }
+        return null;
+    }
 
-        return playerScores.entrySet()
-                .stream()
-                .sorted((e1, e2) -> {
-                    int compare = e2.getValue().compareTo(e1.getValue());
-                    if (compare == 0) {
-                        return e1.getKey().compareTo(e2.getKey());
-                    }
-                    return compare;
-                })
-                .limit(10)
-                .collect(Collectors.toList());
+    private static Map<String, Integer> findBy(String path) {
+        for (File file : getFiles()) {
+            YamlConfiguration tempFile = YamlConfiguration.loadConfiguration(file);
+            cachedData.put(tempFile.getString("name"), tempFile.getInt(path));
+        }
+    }
+
+    private static List<File> getFiles() {
+        try {
+            File playerDataFolder = new File("plugins/Twister/PlayerData");
+            return Arrays.stream(playerDataFolder.listFiles()).toList();
+        } catch (NullPointerException e) {
+            Twister.get().getLogger().warning("No files found in PlayerData directory.");
+        }
+        return null;
     }
 }
 

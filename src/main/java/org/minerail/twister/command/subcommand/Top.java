@@ -15,10 +15,7 @@ public class Top implements SubCommand {
 
     public int execute(CommandSender sender) {
 
-        for (int i = 1; i <= 10; i++) {
-
-        }
-
         return 1;
     }
 }
+

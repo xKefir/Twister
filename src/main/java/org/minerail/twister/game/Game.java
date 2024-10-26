@@ -169,19 +169,21 @@ public class Game {
     }
 
     public static void stop(String taskType) {
-        PlayerUtil.kickAllPlayers("stop");
-
-        if (taskType.equals("game")) {
-            if (task != null) {
-                task.cancel();
+        switch(taskType) {
+            case "stop" -> PlayerUtil.kickAllPlayers("stop");
+            case "game" -> {
+                if (task != null) {
+                    task.cancel();
+                }
+                gameStarted = false;
+                gameIsEnded = false;
             }
-            gameStarted = false;
-            gameIsEnded = false;
-        } else if (taskType.equals("lobby")) {
-            lobbyIsOpen = false;
-            canJoin = false;
-            Start.num = 0;
-            Start.executor = "";
+            case "lobby" -> {
+                lobbyIsOpen = false;
+                canJoin = false;
+                Start.num = 0;
+                Start.executor = "";
+            }
         }
     }
 

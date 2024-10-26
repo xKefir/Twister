@@ -14,8 +14,6 @@ import org.minerail.twister.file.Message.MessageProvider;
 import org.minerail.twister.file.PlayerData;
 import org.minerail.twister.game.Game;
 
-
-
 public class PlayerUtil {
     public static Player w;
 
