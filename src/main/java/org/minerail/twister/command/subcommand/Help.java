@@ -6,9 +6,9 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
-import org.minerail.twister.file.Message.MessageKey;
-import org.minerail.twister.file.Message.MessageProvider;
-import org.minerail.twister.file.Message.MessageProviderLoader;
+import org.minerail.twister.file.message.MessageKey;
+import org.minerail.twister.file.message.MessageProvider;
+import org.minerail.twister.file.message.MessageProviderLoader;
 import org.minerail.twister.util.PlayerUtil;
 
 import java.util.List;

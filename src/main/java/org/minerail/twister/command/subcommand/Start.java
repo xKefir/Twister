@@ -10,10 +10,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.minerail.twister.file.Blocks;
-import org.minerail.twister.file.Config.Config;
-import org.minerail.twister.file.Message.MessageProvider;
-import org.minerail.twister.file.Config.ConfigKey;
-import org.minerail.twister.file.Message.MessageKey;
+import org.minerail.twister.file.config.Config;
+import org.minerail.twister.file.message.MessageProvider;
+import org.minerail.twister.file.config.ConfigKey;
+import org.minerail.twister.file.message.MessageKey;
 import org.minerail.twister.game.Game;
 import org.minerail.twister.gui.TypeSelector;
 

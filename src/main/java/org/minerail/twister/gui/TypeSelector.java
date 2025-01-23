@@ -5,8 +5,8 @@ import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import org.bukkit.entity.Player;
 import org.minerail.twister.file.Blocks;
-import org.minerail.twister.file.Config.Config;
-import org.minerail.twister.file.Config.ConfigKey;
+import org.minerail.twister.file.config.Config;
+import org.minerail.twister.file.config.ConfigKey;
 import org.minerail.twister.util.TextFormatUtil;
 
 public class TypeSelector {

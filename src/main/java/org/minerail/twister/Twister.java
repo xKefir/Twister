@@ -4,13 +4,13 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.minerail.twister.command.CommandTw;
 import org.minerail.twister.event.EventListener;
 import org.minerail.twister.file.Blocks;
-import org.minerail.twister.file.Config.Config;
-import org.minerail.twister.file.Message.MessageProviderLoader;
-import org.minerail.twister.file.PlayerData;
+import org.minerail.twister.file.config.Config;
+import org.minerail.twister.file.message.MessageProviderLoader;
+import org.minerail.twister.file.playerdata.PlayerData;
+import org.minerail.twister.hook.PlaceholderApiHook;
 import org.minerail.twister.task.PlayerDataSaveTask;
 
 
@@ -28,6 +28,9 @@ public final class Twister extends JavaPlugin {
                 new CommandTw().register(e.registrar())
         );
         savePlayerData();
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            new PlaceholderApiHook(this).register();
+        }
     }
     private void savePlayerData() {
         PlayerDataSaveTask saveTask = new PlayerDataSaveTask();

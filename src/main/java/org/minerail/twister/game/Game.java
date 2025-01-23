@@ -11,10 +11,11 @@ import org.bukkit.scheduler.BukkitTask;
 import org.minerail.twister.Twister;
 import org.minerail.twister.command.subcommand.Start;
 import org.minerail.twister.file.Blocks;
-import org.minerail.twister.file.Config.Config;
-import org.minerail.twister.file.Config.ConfigKey;
-import org.minerail.twister.file.Message.MessageKey;
-import org.minerail.twister.file.Message.MessageProvider;
+import org.minerail.twister.file.config.Config;
+import org.minerail.twister.file.config.ConfigKey;
+import org.minerail.twister.file.leaderboard.Leaderboard;
+import org.minerail.twister.file.message.MessageKey;
+import org.minerail.twister.file.message.MessageProvider;
 import org.minerail.twister.util.LocationUtil;
 import org.minerail.twister.util.PlayerUtil;
 
@@ -59,6 +60,7 @@ public class Game {
     }
 
     public static void runGame() {
+        Leaderboard leaderboard = new Leaderboard(players);
         gameStarted = true;
         canJoin = false;
         time = Config.getInt(ConfigKey.SETTINGS_GAME_SECONDS_DURATION_ROUND);

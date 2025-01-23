@@ -4,11 +4,10 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.apache.logging.log4j.message.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.minerail.twister.file.Message.MessageKey;
-import org.minerail.twister.file.Message.MessageProvider;
+import org.minerail.twister.file.message.MessageKey;
+import org.minerail.twister.file.message.MessageProvider;
 import org.minerail.twister.game.Game;
 
 public class Stop implements SubCommand {

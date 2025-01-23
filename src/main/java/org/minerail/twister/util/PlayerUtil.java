@@ -7,11 +7,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.minerail.twister.file.Config.Config;
-import org.minerail.twister.file.Config.ConfigKey;
-import org.minerail.twister.file.Message.MessageKey;
-import org.minerail.twister.file.Message.MessageProvider;
-import org.minerail.twister.file.PlayerData;
+import org.minerail.twister.file.config.Config;
+import org.minerail.twister.file.config.ConfigKey;
+import org.minerail.twister.file.message.MessageKey;
+import org.minerail.twister.file.message.MessageProvider;
+import org.minerail.twister.file.playerdata.PlayerData;
 import org.minerail.twister.game.Game;
 
 public class PlayerUtil {
@@ -38,15 +38,15 @@ public class PlayerUtil {
     public static void changeStats(Player p, String type) {
         switch (type) {
             case "lose" -> {
-                PlayerData.get(p).addLoses(1);
-                PlayerData.get(p).addTotalPlayed(1);
+                PlayerData.get(p).getPlayerStats().addLoss();
+                PlayerData.get(p).getPlayerStats().addGamesPlayed();
             }
             case "win" -> {
-                PlayerData.get(p).addWins(1);
-                PlayerData.get(p).addTotalPlayed(1);
+                PlayerData.get(p).getPlayerStats().addWin();
+                PlayerData.get(p).getPlayerStats().addGamesPlayed();
             }
-            case "quit" -> PlayerData.get(p).addLoses(-1);
-            case "stop" -> PlayerData.get(p).addTotalPlayed(1);
+            case "quit" -> PlayerData.get(p).getPlayerStats().removeLoss();
+            case "stop" -> PlayerData.get(p).getPlayerStats().addGamesPlayed();
         }
     }
 

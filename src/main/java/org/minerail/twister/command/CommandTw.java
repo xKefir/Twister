@@ -7,8 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.minerail.twister.Twister;
 import org.minerail.twister.command.subcommand.*;
-import org.minerail.twister.file.Message.MessageKey;
-import org.minerail.twister.file.Message.MessageProvider;
+import org.minerail.twister.file.message.MessageKey;
+import org.minerail.twister.file.message.MessageProvider;
 import org.minerail.twister.game.Game;
 import org.minerail.twister.util.PlayerUtil;
 

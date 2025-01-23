@@ -2,7 +2,7 @@ package org.minerail.twister.task;
 
 import org.bukkit.scheduler.BukkitRunnable;
 import org.minerail.twister.Twister;
-import org.minerail.twister.file.PlayerData;
+import org.minerail.twister.file.playerdata.PlayerData;
 
 public class PlayerDataSaveTask extends BukkitRunnable {
     @Override
