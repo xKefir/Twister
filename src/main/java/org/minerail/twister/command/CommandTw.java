@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 import org.minerail.twister.Twister;
 import org.minerail.twister.command.subcommand.*;
 import org.minerail.twister.file.message.MessageKey;
-import org.minerail.twister.file.message.MessageProvider;
-import org.minerail.twister.game.Game;
-import org.minerail.twister.util.PlayerUtil;
+import org.minerail.twister.game.core.Game;
+import org.minerail.twister.util.GameUtil;
+import org.minerail.twister.util.TextFormatUtil;
 
 import java.util.List;
 
@@ -39,28 +39,28 @@ public class CommandTw {
     }
     private int execute(CommandSender sender) {
         Player p = Twister.get().getServer().getPlayer(sender.getName());
-        if (!PlayerUtil.playerIsInGame(p)) {
+        if (!GameUtil.isPlayerInGame(p)) {
             if (Game.canJoin) {
-                PlayerUtil.playerJoinToGame(p);
-                sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_JOINED,
-                        Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
+                GameUtil.addPlayer(p);
+                sender.sendMessage(TextFormatUtil.fromMessages(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_JOINED,
+                        Placeholder.component("prefix", TextFormatUtil.fromMessages(MessageKey.MESSAGES_PREFIX_STRING)))
                 );
                 return 1;
             } else if (Game.gameStarted) {
-                sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_GAME_ALREADY_STARTED,
-                        Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
+                sender.sendMessage(TextFormatUtil.fromMessages(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_GAME_ALREADY_STARTED,
+                        Placeholder.component("prefix", TextFormatUtil.fromMessages(MessageKey.MESSAGES_PREFIX_STRING)))
                 );
                 return 1;
             } else {
-                sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_EVENT_NOT_STARTED,
-                        Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)))
+                sender.sendMessage(TextFormatUtil.fromMessages(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_EVENT_NOT_STARTED,
+                        Placeholder.component("prefix", TextFormatUtil.fromMessages(MessageKey.MESSAGES_PREFIX_STRING)))
                 );
                 return 1;
 
             }
         } else {
-            p.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_PLAYER_IS_ALREADY_IN_GAME,
-                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING))));
+            p.sendMessage(TextFormatUtil.fromMessages(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_PLAYER_IS_ALREADY_IN_GAME,
+                    Placeholder.component("prefix", TextFormatUtil.fromMessages(MessageKey.MESSAGES_PREFIX_STRING))));
             return 1;
         }
 

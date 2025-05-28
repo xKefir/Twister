@@ -7,8 +7,9 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.minerail.twister.file.message.MessageKey;
-import org.minerail.twister.file.message.MessageProvider;
-import org.minerail.twister.util.PlayerUtil;
+import org.minerail.twister.util.GameUtil;
+import org.minerail.twister.util.MessageDeliverUtil;
+import org.minerail.twister.util.TextFormatUtil;
 
 public class Teleport implements SubCommand {
     @Override
@@ -19,9 +20,8 @@ public class Teleport implements SubCommand {
     }
 
     public int execute(CommandSender sender) {
-        PlayerUtil.teleportPlayerToArena((Player) sender);
-        sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_TP_TO_SENDER,
-                Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING))));
+        GameUtil.teleportToArena((Player) sender);
+        MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_TP_TO_SENDER);
         return 1;
     }
 }

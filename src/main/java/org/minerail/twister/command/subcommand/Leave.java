@@ -9,34 +9,33 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.minerail.twister.Twister;
 import org.minerail.twister.file.message.MessageKey;
-import org.minerail.twister.file.message.MessageProvider;
 import org.minerail.twister.file.playerdata.PlayerData;
-import org.minerail.twister.game.Game;
-import org.minerail.twister.util.PlayerUtil;
+import org.minerail.twister.game.core.Game;
+import org.minerail.twister.util.GameUtil;
+import org.minerail.twister.util.MessageDeliverUtil;
 
 public class Leave implements SubCommand {
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> get() {
         return Commands.literal("leave")
+                .requires(ctx -> ctx.getSender().hasPermission("tw.use"))
                 .executes(ctx -> execute(ctx.getSource().getSender()));
     }
 
     public int execute(CommandSender sender) {
         Player p = Twister.get().getServer().getPlayer(sender.getName());
-        if (PlayerUtil.playerIsInGame(p)) {
-            PlayerUtil.playerRemoveFromGame(p);
-            sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_LEAVE_SUCCESS,
-                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING))));
+        if (GameUtil.isPlayerInGame(p)) {
+            GameUtil.removePlayer(p);
+            MessageDeliverUtil.sendWithPrefix(sender,MessageKey.MESSAGES_COMMAND_LEAVE_SUCCESS);
 
-            Twister.get().getServer().broadcast(MessageProvider.get(MessageKey.MESSAGES_COMMAND_LEAVE_BROADCAST,
-                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)),
+            MessageDeliverUtil.sendBroadcastWithPrefix(MessageKey.MESSAGES_COMMAND_LEAVE_BROADCAST,
                     Placeholder.component("player", Component.text(sender.getName())),
-                    Placeholder.component("remainplayers", Component.text(Game.players.size()))));
+                    Placeholder.component("remainplayers", Component.text(Game.players.size())));
+
             p.teleport(PlayerData.get(p).getPlayerJoinLocationFromData());
             return 1;
         } else {
-            p.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_LEAVE_PLAYER_IS_NOT_IN_GAME,
-                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING))));
+            MessageDeliverUtil.sendWithPrefix(sender,MessageKey.MESSAGES_COMMAND_LEAVE_PLAYER_IS_NOT_IN_GAME);
         }
         return 1;
     }

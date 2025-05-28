@@ -1,4 +1,4 @@
-package org.minerail.twister.game;
+package org.minerail.twister.game.board;
 
 import org.bukkit.Location;
 

@@ -31,6 +31,14 @@ public enum MessageKey {
     MESSAGES_COMMAND_KICK_PLAYER_IS_NOT_IN_GAME_TO_SENDER("Messages.Command.kick.player-is-not-in-game-to-sender"),
     MESSAGES_COMMAND_KICK_TO_TARGETED_PLAYER("Messages.Command.kick.to-targeted-player"),
 
+    MESSAGES_COMMAND_TOP_TYPES_WINS("Messages.Command.top.types.wins"),
+    MESSAGES_COMMAND_TOP_TYPES_LOSES("Messages.Command.top.types.loses"),
+    MESSAGES_COMMAND_TOP_TYPES_TOTALPLAYED("Messages.Command.top.types.totalPlayed"),
+    MESSAGES_COMMAND_TOP_HEADER("Messages.Command.top.header"),
+    MESSAGES_COMMAND_TOP_LISTLINE("Messages.Command.top.listLine"),
+
+    MESSAGES_COMMAND_STATS("Messages.Command.stats"),
+
     MESSAGES_COMMAND_RELOAD_SUCCESS("Messages.Command.reload.success"),
     MESSAGES_COMMAND_RELOAD_ERROR("Messages.Command.reload.error"),
 

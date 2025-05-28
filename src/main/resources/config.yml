@@ -7,12 +7,18 @@ Settings:
       items:
         type: BLUE_STAINED_GLASS_PANE
         show-amounts: true
+  Hook:
+    WorldGuard:
+      enabled: true
+      take-players-inventory: true
+      game-region: "twister"
 
   Game:
+    take-players-inv-on-join: true
     subtracted-time-multiplier: 0.8
     seconds-duration-round: 8
     min-players: 2
-    max-field-size: 10
+    max-field-size: 9
 
 Arena:
   world: "Your world name"

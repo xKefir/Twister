@@ -4,8 +4,8 @@ import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import org.bukkit.entity.Player;
+import org.minerail.twister.Twister;
 import org.minerail.twister.file.Blocks;
-import org.minerail.twister.file.config.Config;
 import org.minerail.twister.file.config.ConfigKey;
 import org.minerail.twister.util.TextFormatUtil;
 
@@ -22,8 +22,8 @@ public class TypeSelector {
 
     private void createGui() {
         gui = Gui.gui()
-                .title(TextFormatUtil.format(Config.getString(ConfigKey.SETTINGS_GUI_TITLE)))
-                .rows(Config.getInt(ConfigKey.SETTINGS_GUI_SIZE))
+                .title(TextFormatUtil.format(Twister.getConfigFile().getString(ConfigKey.SETTINGS_GUI_TITLE)))
+                .rows(Twister.getConfigFile().getInt(ConfigKey.SETTINGS_GUI_SIZE))
                 .create();
     }
 

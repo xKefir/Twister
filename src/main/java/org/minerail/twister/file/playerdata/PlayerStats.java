@@ -16,6 +16,7 @@ public class PlayerStats {
         this.wins = wins;
         this.losses = losses;
         this.gamesPlayed = gamesPlayed;
+
     }
 
     public int getWins() {

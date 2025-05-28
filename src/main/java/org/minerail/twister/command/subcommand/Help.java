@@ -6,10 +6,11 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
+import org.minerail.twister.Twister;
 import org.minerail.twister.file.message.MessageKey;
-import org.minerail.twister.file.message.MessageProvider;
 import org.minerail.twister.file.message.MessageProviderLoader;
-import org.minerail.twister.util.PlayerUtil;
+import org.minerail.twister.util.GameUtil;
+import org.minerail.twister.util.MessageDeliverUtil;
 
 import java.util.List;
 
@@ -23,21 +24,13 @@ public class Help implements SubCommand {
     }
     public int execute(CommandSender sender) {
         List<Component> messages;
-        if (PlayerUtil.w == null) {
-            replacer = MessageProviderLoader.getString(MessageKey.MESSAGES_CONSTANTS_LAST_WINNER.getPath());
+        if (GameUtil.getWinningPlayer() == null) {
+            replacer = Twister.getMessages().getString(MessageKey.MESSAGES_CONSTANTS_LAST_WINNER.getPath());
         } else {
-            replacer = PlayerUtil.w.getName();
+            replacer = GameUtil.getWinningPlayer().getName();
         }
-            messages = MessageProvider.getList(MessageKey.MESSAGES_COMMAND_HELP,
-                    Placeholder.component("lastwinner", Component.text(replacer)),
-                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)));
-
-
-        Component combinedMessage = Component.empty();
-        for (Component message : messages) {
-            combinedMessage = combinedMessage.append(message).append(Component.text("\n"));
-        }
-        sender.sendMessage(combinedMessage);
+            MessageDeliverUtil.sendListWithPrefix(sender, MessageKey.MESSAGES_COMMAND_HELP,
+                    Placeholder.component("lastwinner", Component.text(replacer)));
         return 1;
     }
 }

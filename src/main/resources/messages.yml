@@ -38,19 +38,18 @@ Messages:
       player-is-not-in-game-to-sender: '<prefix>&cPodany gracz &b<player> &cnie uczestniczy w grze.'
       to-targeted-player: '<prefix>&cZostałeś/aś wyrzucony z gry.'
     top:
-      List:
-        header: '&aTop 10 wygranych.'
-        1: '<1>'
-        2: '<2>'
-        3: '<3>'
-        4: '<4>'
-        5: '<5>'
-        6: '<6>'
-        7: '<7>'
-        8: '<8>'
-        9: '<9>'
-        10: '<10>'
-        #Maximum 10 elements
+      types:
+        wins: 'Wygrane'
+        loses: 'Przegrane'
+        totalPlayed: 'Wszystkie rozegrane'
+      header: '&aTop 10 wygranych - <top>.'
+      listLine: "&7<pos>. &e<player>&a: &c<value>"
+    stats:
+      - "<gold>Statystyki gracza <yellow><player><gold>:"
+      - "<gray>- <green>Wygrane: <white><wins> <gray>(#<winsRank>)"
+      - "<gray>- <red>Przegrane: <white><loses> <gray>(#<losesRank>)"
+      - "<gray>- <aqua>Rozegrane gry: <white><totalPlayed> <gray>(#<totalRank>)"
+
     reload:
       success: '<prefix>&aPomyślnie przeładowano konfigurację.'
       error: '<prefix>&cNie udało się przeładować, zobacz konsolę.'

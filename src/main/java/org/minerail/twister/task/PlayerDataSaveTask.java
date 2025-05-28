@@ -12,6 +12,5 @@ public class PlayerDataSaveTask extends BukkitRunnable {
 
     public void start(long interval) {
         this.runTaskTimerAsynchronously(Twister.get(), 0L, interval);
-
     }
 }

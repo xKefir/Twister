@@ -10,9 +10,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.minerail.twister.Twister;
 import org.minerail.twister.file.message.MessageKey;
-import org.minerail.twister.file.message.MessageProvider;
-import org.minerail.twister.game.Game;
-import org.minerail.twister.util.PlayerUtil;
+import org.minerail.twister.game.core.Game;
+import org.minerail.twister.util.GameUtil;
+import org.minerail.twister.util.MessageDeliverUtil;
 
 import static io.papermc.paper.command.brigadier.Commands.argument;
 
@@ -36,19 +36,17 @@ public class Kick implements SubCommand {
 
 
     public int execute(CommandSender sender, String target) {
-        if (PlayerUtil.playerIsInGame(Twister.get().getServer().getPlayer(target))) {
+        if (GameUtil.isPlayerInGame(Twister.get().getServer().getPlayer(target))) {
             Player target1 = Twister.get().getServer().getPlayer(target);
-            PlayerUtil.playerRemoveFromGame(target1);
-            target1.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_KICK_TO_TARGETED_PLAYER,
-                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING))));
-            sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_KICK_TO_SENDER,
-                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)),
-                    Placeholder.component("player", Component.text(target))));
+            GameUtil.removePlayer(target1);
+            MessageDeliverUtil.sendWithPrefix(target1, MessageKey.MESSAGES_COMMAND_KICK_TO_TARGETED_PLAYER);
+
+            MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_KICK_TO_SENDER,
+                    Placeholder.component("player", Component.text(target)));
             return 1;
         } else {
-            sender.sendMessage(MessageProvider.get(MessageKey.MESSAGES_COMMAND_KICK_PLAYER_IS_NOT_IN_GAME_TO_SENDER,
-                    Placeholder.component("prefix", MessageProvider.get(MessageKey.MESSAGES_PREFIX_STRING)),
-                    Placeholder.component("player", Component.text(target))));
+            MessageDeliverUtil.sendWithPrefix(sender,MessageKey.MESSAGES_COMMAND_KICK_PLAYER_IS_NOT_IN_GAME_TO_SENDER,
+                    Placeholder.component("player", Component.text(target)));
             return 1;
         }
     }
