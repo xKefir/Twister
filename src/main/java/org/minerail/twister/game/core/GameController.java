@@ -18,6 +18,7 @@ public class GameController {
     protected final int MIN_PLAYERS = configFile.getInt(ConfigKey.SETTINGS_GAME_MIN_PLAYERS);
     protected final long COUNTDOWN = 5000; //Before starting game
     protected final long CLEAR_AREA_DELAY = 2000;
+    public final long AREA_ANIM_TIME = 1000;
     public final double MATERIAL_SELECTION_DELAY = 0.20;
     protected volatile long ROUND_DURATION_TIME = configFile.getInt(ConfigKey.SETTINGS_GAME_SECONDS_DURATION_ROUND) * 1000L;
     public final double DECREMENT_PER_ROUND = configFile.getInt(ConfigKey.SETTINGS_GAME_SUBTRACTED_TIME_MULTIPLIER);

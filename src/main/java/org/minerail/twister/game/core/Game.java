@@ -36,6 +36,12 @@ public class Game {
     protected Material randomMaterial;
     private BukkitTask gameTask;
     private volatile Set<String> materials;
+    private volatile long RUNNING_GAME_START_TIME;
+    private volatile long FINISH_GAME_STATUS_STARTED;
+
+    //Flags
+    private volatile boolean runningStateStarted = false;
+    private volatile boolean finishStateStarted = false;
 
     //Animations
     BoardAnimation boardAnimation = new BoardAnimation();
@@ -49,13 +55,15 @@ public class Game {
 
     //Run Countdown
     protected void runCountdown() {
-        runCountdownAnimation();
+        runCountdownAnimation(controller.COUNTDOWN);
     }
 
     //Run CountdownXPBarAnimation
-    protected void runCountdownAnimation() {
-        countDownXPBarAnimation.start(controller.COUNTDOWN).then(this::runGame);
-        LogUtil.debug("CountdownXPBarAnimation completed! Running game...");
+    protected void runCountdownAnimation(long countdown) {
+        countDownXPBarAnimation.start(countdown).then(() -> {
+            runGame();
+            LogUtil.debug("CountdownXPBarAnimation completed! Running game...");
+        });
     }
 
     //Run Game
@@ -65,14 +73,29 @@ public class Game {
             controller.currentTime = System.currentTimeMillis(); //Updating current time for other classes
             switch (controller.getCurrentGameState()) {
                 case GameController.GameState.RUNNING -> {
-
+                    if (!runningStateStarted) {
+                        RUNNING_GAME_START_TIME = controller.currentTime;
+                        runningStateStarted = true;
+                    }
+                    if ((controller.currentTime - RUNNING_GAME_START_TIME) >= controller.CLEAR_AREA_DELAY) {
+                        if (controller.getPlayersList().size() <= controller.MIN_PLAYERS) controller.transitionGameStateTo(GameController.GameState.FINISHED);
+                        if (!boardAnimation.isRunning()) runBoardAnimation();
+                    }
+                    //Etap między rundami, rozpoczyna się delay na uzupełnienie areny i jej pomieszanie a następnie rozpoczecie rundy
                 }
-                case GameController.GameState.ROUND_RUNNING -> {}
+//                case GameController.GameState.ROUND_RUNNING -> {}
                 case GameController.GameState.ROUND_END -> {
                     board.removeAllBlocksExcept(randomMaterial);
                 }
                 case GameController.GameState.FINISHED -> {
-                    round.clear();
+                    if (!finishStateStarted) {
+                        FINISH_GAME_STATUS_STARTED = controller.currentTime;
+                        finishStateStarted = true;
+                    }
+                    if ((controller.currentTime - FINISH_GAME_STATUS_STARTED) >= controller.GAME_END_DELAY) {
+                        round.clear();
+                        gameTask.cancel();
+                    }
 
                 }
             }
