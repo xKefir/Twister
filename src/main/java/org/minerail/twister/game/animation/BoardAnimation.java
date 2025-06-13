@@ -1,16 +1,22 @@
 package org.minerail.twister.game.animation;
 
-public class BoardAnimation implements Animation {
-    private Runnable nextction;
+import org.minerail.twister.game.board.Board;
+
+public class BoardAnimation implements Animation<Board> {
+    private Runnable callback;
+    private Board board;
+    private boolean running = false;
+
     @Override
-    public Animation start(Object param) {
-        
+    public Animation start(Board param) {
+
         return this;
     }
 
     @Override
     public void stop() {
-
+        running = false;
+        if (callback != null) callback.run();
     }
 
     @Override
@@ -20,7 +26,7 @@ public class BoardAnimation implements Animation {
 
     @Override
     public Animation then(Runnable nextAction) {
-        this.nextction = nextAction;
+        this.callback = nextAction;
         return this;
     }
 }

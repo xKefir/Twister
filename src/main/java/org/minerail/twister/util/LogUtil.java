@@ -1,12 +1,14 @@
 package org.minerail.twister.util;
 
+import com.sun.security.auth.login.ConfigFile;
 import org.minerail.twister.Twister;
+import org.minerail.twister.file.config.ConfigKey;
 
 import java.util.logging.Logger;
 
 public class LogUtil {
     private static final Logger LOGGER = Twister.get().getLogger();
-    private static boolean debug = true;
+    private static boolean debug = Twister.getConfigFile().getBoolean(ConfigKey.SETTINGS_PLUGIN_DEBUG);
 
     public static void setDebug(boolean state) {
         debug = state;

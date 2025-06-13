@@ -14,6 +14,7 @@ import org.minerail.twister.file.Blocks;
 import org.minerail.twister.file.config.ConfigKey;
 import org.minerail.twister.file.message.MessageKey;
 import org.minerail.twister.game.core.Game;
+import org.minerail.twister.game.core.GameController;
 import org.minerail.twister.gui.TypeSelector;
 import org.minerail.twister.util.MessageDeliverUtil;
 
@@ -22,8 +23,9 @@ import static io.papermc.paper.command.brigadier.Commands.argument;
 
 public class Start implements SubCommand {
 
-    public static int num = 0;
-    public static String executor;
+    private static int num = 0;
+    private static String executor;
+    private final GameController controller = Twister.getGameController();
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> get() {
@@ -93,14 +95,10 @@ public class Start implements SubCommand {
 
     private void secondTime(CommandSender sender) {
         if (sender.getName().equals(executor)) {
-            if (Game.getPlayerCount() >= Twister.getConfigFile().getInt(ConfigKey.SETTINGS_GAME_MIN_PLAYERS)) {
-                Game.runGame();
+            if (controller.prepareToStartGame()) {
                 num++;
-
                 MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_START_SECOND_TIME_TO_SENDER);
                 MessageDeliverUtil.sendBroadcastWithPrefix(MessageKey.MESSAGES_COMMAND_START_SECOND_TIME_BROADCAST);
-
-                Game.lobbyIsOpen = false;
                 num = 0;
             } else {
                 MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_START_SECOND_TIME_TO_SENDER_ERROR);

@@ -2,6 +2,8 @@ package org.minerail.twister.file.config;
 
 public enum ConfigKey {
 
+    SETTINGS_PLUGIN_DEBUG("Settings.Plugin.debug"),
+
     SETTINGS_GUI_MODULE_ENABLED("Settings.Gui.open"),
     SETTINGS_GUI_TITLE("Settings.Gui.title"),
     SETTINGS_GUI_SIZE("Settings.Gui.size"),

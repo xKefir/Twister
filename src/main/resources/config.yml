@@ -1,4 +1,6 @@
 Settings:
+  Plugin:
+    debug: true
   Gui:
     open: false
     title: "&b&lT&a&lw&6&li&3&ls&d&lt&e&le&c&lr"

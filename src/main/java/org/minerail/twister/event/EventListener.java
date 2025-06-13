@@ -48,7 +48,6 @@ public class EventListener implements Listener {
         switch(e.getState()) {
             case RUNNING -> LogUtil.debug("GameState: RUNNING");
             case WAITING -> LogUtil.debug("GameState: WAITING");
-            case LOBBY_OPEN -> LogUtil.debug("GameState: LOBBY_OPEN");
             case COUNTDOWN -> LogUtil.debug("GameState: COUNTDOWN");
             case ROUND_RUNNING -> LogUtil.debug("GameState: ROUND_RUNNING");
             case ROUND_END -> LogUtil.debug("GameState: ROUND_END");

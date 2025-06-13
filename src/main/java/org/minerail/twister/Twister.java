@@ -10,6 +10,7 @@ import org.minerail.twister.file.config.ConfigFile;
 import org.minerail.twister.file.leaderboard.Leaderboard;
 import org.minerail.twister.file.message.MessageProviderLoader;
 import org.minerail.twister.file.playerdata.PlayerData;
+import org.minerail.twister.game.core.GameController;
 import org.minerail.twister.hook.PlaceholderApiHook;
 import org.minerail.twister.task.PlayerDataSaveTask;
 
@@ -18,6 +19,7 @@ public final class Twister extends JavaPlugin {
     private Leaderboard leaderboard;
     private static MessageProviderLoader messages;
     private static ConfigFile config;
+    private static GameController controller;
 
     public static Twister get() {return instance;}
 
@@ -27,6 +29,9 @@ public final class Twister extends JavaPlugin {
     public static ConfigFile getConfigFile() {
         return config;
     }
+    public static GameController getGameController() {
+        return controller;
+    }
 
     @Override
     public void onEnable() {
@@ -35,6 +40,7 @@ public final class Twister extends JavaPlugin {
         config = new ConfigFile();
         messages = new MessageProviderLoader();
         leaderboard = new Leaderboard(getDataFolder());
+        controller = new GameController();
         PlayerData.initLeaderboardIntegration(leaderboard);
 
         getServer().getPluginManager().registerEvents(new EventListener(), this);

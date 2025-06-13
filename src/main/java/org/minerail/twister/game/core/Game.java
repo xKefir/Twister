@@ -1,125 +1,119 @@
 package org.minerail.twister.game.core;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.minerail.twister.Twister;
-import org.minerail.twister.event.GameStateChangeEvent;
 import org.minerail.twister.file.Blocks;
 import org.minerail.twister.file.config.ConfigFile;
 import org.minerail.twister.game.animation.BoardAnimation;
+import org.minerail.twister.game.animation.CountDownXPBarAnimation;
 import org.minerail.twister.game.animation.HotbarAnimation;
 import org.minerail.twister.game.board.Board;
 import org.minerail.twister.game.board.BoardBuilder;
 import org.minerail.twister.util.LogUtil;
-
-import java.util.HashSet;
 import java.util.Set;
 
 public class Game {
-    //Flags
-    public enum LobbyState {
-        OPEN,
-        CLOSED;
-    }
-    private volatile boolean lobbyJoiningPhase = false;
 
-//    public enum PlayerState {
-//        IN_LOBBY,
-//        PLAYING,
-//        ELIMINATED,
-//        SPECTATING,
-//        OUT_OF_GAME;
-//    }
-
-    public enum GameState {
-        //Waiting for running game
-        WAITING,
-        RUNNING,
-        //Before starting round - runs Board Animation
-        COUNTDOWN,
-        ROUND_RUNNING,
-        ROUND_END,
-        FINISHED;
-    }
-    //States
-    private volatile GameState currentGameState = GameState.FINISHED;
-    private volatile LobbyState currentLobbyState = LobbyState.CLOSED;
-//    private volatile PlayerState currentPlayerState = PlayerState.OUT_OF_GAME;
-
-    //Game information
-    private final Set<Player> players = new HashSet<>();
-    private int round;
+    /*
+    Gra zostaje uruchomiona i zaczyna się mieszanie areny oraz odliczanie do rozpoczęcia rundy
+    Runda się kończy rozpoczyna się delay 2s do uzupelnienia areny. Następnie przez 1 sekundę miesza arenę.
+    Rozpoczyna się nowa runda i mieszanie hotbara.
+    *no i tak w kółko*
+     */
 
     //Init
     private ConfigFile configFile = Twister.getConfigFile();
+    private GameController controller;
+    private Round round;
+    public Board board;
 
-    //Game config
-    private final long CLEAR_AREA_DELAY = 2000L;
-    private final long GAME_END_DELAY = 2000L;
-    private final double MATERIAL_SELECTION_DELAY = 0.35;
-    private final double INCREMENT_PER_ROUND = 0.06;
-    private final long MIN_ROUND_TIME = 1L;
-    private Board board;
+    //Variables
+    protected ItemStack randomItem;
+    protected Material randomMaterial;
     private BukkitTask gameTask;
     private volatile Set<String> materials;
 
     //Animations
     BoardAnimation boardAnimation = new BoardAnimation();
     HotbarAnimation hotbarAnimation = new HotbarAnimation();
+    CountDownXPBarAnimation countDownXPBarAnimation = new CountDownXPBarAnimation();
 
-
-    //Open Lobby and setup area
-    public void setupLobby(int fieldSize, String type) {
-        transitionLobbyStateTo(LobbyState.OPEN);
-        transitionGameStateTo(GameState.WAITING);
-        initBoard(fieldSize, type);
-        LogUtil.debug("Lobby is set to: OPEN");
+    public Game(GameController controller, Round round) {
+        this.controller = controller;
+        this.round = round;
     }
+
+    //Run Countdown
+    protected void runCountdown() {
+        runCountdownAnimation();
+    }
+
+    //Run CountdownXPBarAnimation
+    protected void runCountdownAnimation() {
+        countDownXPBarAnimation.start(controller.COUNTDOWN).then(this::runGame);
+        LogUtil.debug("CountdownXPBarAnimation completed! Running game...");
+    }
+
+    //Run Game
+    protected void runGame() {
+        controller.transitionGameStateTo(GameController.GameState.RUNNING);
+        gameTask = Bukkit.getScheduler().runTaskTimer(Twister.get(), () -> {
+            controller.currentTime = System.currentTimeMillis(); //Updating current time for other classes
+            switch (controller.getCurrentGameState()) {
+                case GameController.GameState.RUNNING -> {
+
+                }
+                case GameController.GameState.ROUND_RUNNING -> {}
+                case GameController.GameState.ROUND_END -> {
+                    board.removeAllBlocksExcept(randomMaterial);
+                }
+                case GameController.GameState.FINISHED -> {
+                    round.clear();
+
+                }
+            }
+        }, 0, 1L);
+    }
+
     //Initialize and setup area
-    private void initBoard(int fieldSize, String type) {
+    protected void initBoard(int fieldSize, String type) {
         materials = Blocks.getMaterialList(type);
         board = new BoardBuilder().setCorners().setFieldSize(fieldSize).setMaterials(materials).build();
         board.fillAreasWithMaterials();
     }
-    //Prepare to start game
-    public void setupGame() {
-        transitionLobbyStateTo(LobbyState.CLOSED);
-        transitionGameStateTo(GameState.COUNTDOWN);
-        runBoardAnimation();
-    }
+
     //Run BoardAnimation
     private void runBoardAnimation() {
         boardAnimation.start(board).then(() -> {
-            runGame();
-            LogUtil.debug("BoardAnimation completed! Running game...");
+            round.startNewRound();
+            LogUtil.debug("BoardAnimation completed! Starting new round...");
         });
     }
 
-    //Run Game
-    private void runGame() {
-        transitionGameStateTo(GameState.RUNNING);
-        Bukkit.getScheduler().runTaskTimer(Twister.get(), () -> {
-
-        }, 0, delay);
+    protected void runHotbarAnimation() {
+        hotbarAnimation.start(calculateHotbarAnimationDuration()).then(() -> {
+            randomMaterial = board.getRandomMaterial();
+            randomItem = new ItemStack(randomMaterial);
+            for (Player p : controller.getPlayersList()) {
+                for (int i = 0; i < 9; i++) {
+                    p.getInventory().setItem(i, randomItem);
+                }
+            }
+            LogUtil.debug("Set up players inventories");
+            LogUtil.debug("HotbarAnimation completed!");
+        });
     }
 
-    //Players Handler
-    public void addPlayer(Player p) {
-        players.add(p);
-    }
-    public void removePlayer(Player p) {
-        players.remove(p);
+    private long calculateHotbarAnimationDuration() {
+        return (long) (round.getRoundDurationTime() * controller.MATERIAL_SELECTION_DELAY * 1);
     }
 
-    //Supporting code methods
-    Set<Player> getPlayersList() {
-        return this.players;
-    }
 
-    public int getCurrentRound() {
-        return round;
-    }
+
 
     //PlayerState methods
 //    public void transitionPlayerStateTo(PlayerState newState) {
@@ -128,23 +122,5 @@ public class Game {
 //    public PlayerState getCurrentPlayerState() {
 //        return this.currentPlayerState;
 //    }
-    //LobbyState methods
-    public void transitionLobbyStateTo(LobbyState newState) {
-        this.currentLobbyState = newState;
-        switch(newState) {
-            case OPEN -> lobbyJoiningPhase = true;
-            case CLOSED -> lobbyJoiningPhase = false;
-        }
-    }
-    public LobbyState getCurrentLobbyState() {
-        return this.currentLobbyState;
-    }
-    //GameState methods
-    public void transitionGameStateTo(GameState newState) {
-        this.currentGameState = newState;
-        Bukkit.getServer().getPluginManager().callEvent(new GameStateChangeEvent(newState));
-    }
-    public GameState getCurrentGameState() {
-        return this.currentGameState;
-    }
+
 }
