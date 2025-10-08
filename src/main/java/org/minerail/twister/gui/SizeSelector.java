@@ -13,12 +13,12 @@ import org.minerail.twister.command.subcommand.Start;
 import org.minerail.twister.file.config.ConfigKey;
 import org.minerail.twister.file.message.MessageKey;
 import org.minerail.twister.game.core.Game;
-import org.minerail.twister.util.GameUtil;
+import org.minerail.twister.game.core.GameController;
 import org.minerail.twister.util.MessageDeliverUtil;
 import org.minerail.twister.util.TextFormatUtil;
 
 public class SizeSelector {
-
+    private final GameController controller = Twister.get().getGameController();
     private Gui gui;
     private String type;
 
@@ -32,24 +32,23 @@ public class SizeSelector {
 
     private void createGui() {
         gui = Gui.gui()
-                .title(TextFormatUtil.format(Twister.getConfigFile().getString(ConfigKey.SETTINGS_GUI_TITLE)))
-                .rows(Twister.getConfigFile().getInt(ConfigKey.SETTINGS_GUI_SIZE))
+                .title(TextFormatUtil.format(Twister.get().getConfigFile().getString(ConfigKey.SETTINGS_GUI_TITLE)))
+                .rows(Twister.get().getConfigFile().getInt(ConfigKey.SETTINGS_GUI_SIZE))
                 .create();
     }
 
     private void createItems() {
-        for (int i = 1; i <= Twister.getConfigFile().getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE); i++) {
+        for (int i = 1; i <= Twister.get().getConfigFile().getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE); i++) {
             int size = i;
-            GuiItem item = ItemBuilder.from(new ItemStack(Material.valueOf(Twister.getConfigFile().getString(ConfigKey.SETTINGS_GUI_SIZESELECTOR_ITEMS_TYPE)), i))
+            GuiItem item = ItemBuilder.from(new ItemStack(Material.valueOf(Twister.get().getConfigFile().getString(ConfigKey.SETTINGS_GUI_SIZESELECTOR_ITEMS_TYPE)), i))
                     .name(TextFormatUtil.format("&e&l" + i))
-                    .amount(Twister.getConfigFile().getBoolean(ConfigKey.SETTINGS_GUI_SIZESELECTOR_ITEMS_SHOW_AMOUNTS) ? i : 1)
+                    .amount(Twister.get().getConfigFile().getBoolean(ConfigKey.SETTINGS_GUI_SIZESELECTOR_ITEMS_SHOW_AMOUNTS) ? i : 1)
                     .asGuiItem(event -> {
-                        Game.runLobby(size, type);
-                        Game.lobbyIsOpen = true;
+                        controller.setupLobby(size, type);
                         Start.num++;
                         Start.executor = event.getWhoClicked().getName();
 
-                        GameUtil.addPlayer((Player) event.getWhoClicked());
+                        controller.getPlayerHandler().addPlayer((Player) event.getWhoClicked());
                         gui.close(event.getWhoClicked());
                         MessageDeliverUtil.sendWithPrefix(event.getWhoClicked(), MessageKey.MESSAGES_COMMAND_START_FIRST_TIME_TO_SENDER,
                                 Placeholder.component("poolsize", Component.text(size)),

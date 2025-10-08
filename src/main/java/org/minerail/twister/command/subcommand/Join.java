@@ -8,11 +8,11 @@ import org.bukkit.entity.Player;
 import org.minerail.twister.Twister;
 import org.minerail.twister.file.message.MessageKey;
 import org.minerail.twister.game.core.Game;
-import org.minerail.twister.util.GameUtil;
+import org.minerail.twister.game.core.GameController;
 import org.minerail.twister.util.MessageDeliverUtil;
 
 public class Join implements SubCommand {
-
+    private GameController controller =  Twister.get().getGameController();
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> get() {
         return Commands.literal("join")
@@ -22,21 +22,22 @@ public class Join implements SubCommand {
 
     public int execute(CommandSender sender) {
         Player p = Twister.get().getServer().getPlayer(sender.getName());
-        if (!GameUtil.isPlayerInGame(p)) {
-            if (Game.canJoin) {
-                GameUtil.addPlayer(p);
-                MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_JOINED);
-                return 1;
-            } else if (Game.gameStarted) {
-                MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_GAME_ALREADY_STARTED);
-                return 1;
-            } else {
-                MessageDeliverUtil.sendWithPrefix(sender,MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_EVENT_NOT_STARTED);
-                return 1;
-            }
-        } else {
-            MessageDeliverUtil.sendWithPrefix(sender,MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_PLAYER_IS_ALREADY_IN_GAME);
+
+        if (controller.getCurrentLobbyState() == GameController.LobbyState.CLOSED) {
+            MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_GAME_ALREADY_STARTED);
             return 1;
         }
+
+        if (controller.getCurrentLobbyState() == GameController.LobbyState.NONE) {
+            MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_EVENT_NOT_STARTED);
+            return 1;
+        }
+
+        if (controller.getPlayerHandler().addPlayer(p)) {
+            MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_JOINED);
+        } else {
+            MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_PLAYER_IS_ALREADY_IN_GAME);
+        }
+        return 1;
     }
 }

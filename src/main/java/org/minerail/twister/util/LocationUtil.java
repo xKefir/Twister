@@ -7,7 +7,7 @@ import org.minerail.twister.file.config.ConfigFile;
 import org.minerail.twister.file.config.ConfigKey;
 
 public class LocationUtil {
-    private static ConfigFile config = Twister.getConfigFile();
+    private static ConfigFile config = Twister.get().getConfigFile();
 
     public static Location serializeLocation(double x, double y, double z, String world) {
         return new Location(Bukkit.getWorld(world), x, y, z);

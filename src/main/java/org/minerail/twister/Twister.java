@@ -7,42 +7,43 @@ import org.minerail.twister.command.CommandTw;
 import org.minerail.twister.event.EventListener;
 import org.minerail.twister.file.Blocks;
 import org.minerail.twister.file.config.ConfigFile;
-import org.minerail.twister.file.leaderboard.Leaderboard;
+import org.minerail.twister.file.config.ConfigKey;
 import org.minerail.twister.file.message.MessageProviderLoader;
 import org.minerail.twister.file.playerdata.PlayerData;
 import org.minerail.twister.game.core.GameController;
 import org.minerail.twister.hook.PlaceholderApiHook;
 import org.minerail.twister.task.PlayerDataSaveTask;
+import org.minerail.twister.util.LogUtil;
 
 public final class Twister extends JavaPlugin {
     private static Twister instance;
-    private Leaderboard leaderboard;
-    private static MessageProviderLoader messages;
-    private static ConfigFile config;
-    private static GameController controller;
-
     public static Twister get() {return instance;}
+    /*private Leaderboard leaderboard;*/
+    private  ConfigFile config;
+    private  MessageProviderLoader messages;
+    private  GameController controller;
 
-    public static MessageProviderLoader getMessages() {
-        return messages;
-    }
-    public static ConfigFile getConfigFile() {
+
+    public ConfigFile getConfigFile() {
         return config;
     }
-    public static GameController getGameController() {
+    public MessageProviderLoader getMessages() {
+        return messages;
+    }
+    public GameController getGameController() {
         return controller;
     }
 
     @Override
     public void onEnable() {
         instance = this;
-
         config = new ConfigFile();
         messages = new MessageProviderLoader();
-        leaderboard = new Leaderboard(getDataFolder());
+        /*leaderboard = new Leaderboard(getDataFolder());*/
+        /*PlayerData.initLeaderboardIntegration(leaderboard);*/
+        reloadAll();
         controller = new GameController();
-        PlayerData.initLeaderboardIntegration(leaderboard);
-
+        controller.afterRunServer();
         getServer().getPluginManager().registerEvents(new EventListener(), this);
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, e ->
@@ -51,19 +52,23 @@ public final class Twister extends JavaPlugin {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             new PlaceholderApiHook(this).register();
         }
-        reloadAll();
+        checkDebugger();
         savePlayerData();
+    }
+
+    private void checkDebugger() {
+        LogUtil.setDebug(config.getBoolean(ConfigKey.SETTINGS_PLUGIN_DEBUG));
     }
 
     @Override
     public void onDisable() {
         PlayerData.saveAll();
-        if (leaderboard != null) {
-            leaderboard.save();
-        }
+//        if (leaderboard != null) {
+//            leaderboard.save();
+//        }
     }
 
-    public static void reloadAll() {
+    public void reloadAll() {
         config.reload();
         Blocks.create();
         PlayerData.saveAll();

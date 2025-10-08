@@ -1,44 +1,48 @@
 package org.minerail.twister.game.core;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.Location;
 import org.minerail.twister.Twister;
 import org.minerail.twister.event.GameStateChangeEvent;
 import org.minerail.twister.file.config.ConfigFile;
 import org.minerail.twister.file.config.ConfigKey;
+import org.minerail.twister.util.LocationUtil;
 import org.minerail.twister.util.LogUtil;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.minerail.twister.util.TickConverter;
 
 public class GameController {
-    private ConfigFile configFile = Twister.getConfigFile();
+    private ConfigFile configFile = Twister.get().getConfigFile();
 
     //Variables
-    protected final int MIN_PLAYERS = configFile.getInt(ConfigKey.SETTINGS_GAME_MIN_PLAYERS);
-    protected final long COUNTDOWN = 5000; //Before starting game
-    protected final long CLEAR_AREA_DELAY = 2000;
-    public final long AREA_ANIM_TIME = 1000;
-    public final double MATERIAL_SELECTION_DELAY = 0.20;
-    protected volatile long ROUND_DURATION_TIME = configFile.getInt(ConfigKey.SETTINGS_GAME_SECONDS_DURATION_ROUND) * 1000L;
-    public final double DECREMENT_PER_ROUND = configFile.getInt(ConfigKey.SETTINGS_GAME_SUBTRACTED_TIME_MULTIPLIER);
-    protected final long MIN_ROUND_TIME = 1L;
-    protected final long GAME_END_DELAY = 2000;
-    public volatile long currentTime;
+    protected int MIN_PLAYERS = configFile.getInt(ConfigKey.SETTINGS_GAME_MIN_PLAYERS);
+    protected final long COUNTDOWN = TickConverter.msToTicks(5000); // 100 ticków (5 sekund)
+    protected final long CLEAR_AREA_DELAY = TickConverter.msToTicks(2000); // 40 ticków (2 sekundy)
+    public final long AREA_ANIM_TIME = TickConverter.msToTicks(1000); // 20 ticków (1 sekunda)
+    public final double MATERIAL_SELECTION_DELAY = 0.20; // 20% czasu rundy
+    protected volatile long ROUND_DURATION_TIME = TickConverter.msToTicks(configFile.getInt(ConfigKey.SETTINGS_GAME_SECONDS_DURATION_ROUND) * 1000L);
+    public final double DECREMENT_PER_ROUND = configFile.getDouble(ConfigKey.SETTINGS_GAME_SUBTRACTED_TIME_MULTIPLIER);
+    protected final long MIN_ROUND_TIME = TickConverter.msToTicks(2000); // Minimum 2 sekundy (40 ticków)
+    //protected final long GAME_END_DELAY = TickConverter.msToTicks(2000); // 40 ticków (2 sekundy)
+
+    // TICK COUNTER zamiast currentTime
+    public volatile long currentTick = 0;
 
     //States
-    private volatile GameController.GameState currentGameState = GameController.GameState.FINISHED;
-    private volatile GameController.LobbyState currentLobbyState = GameController.LobbyState.CLOSED;
-
-    //Game information
-    private final Set<Player> players = new HashSet<>();
+    private volatile GameState currentGameState = GameState.FINISHED;
+    private volatile LobbyState currentLobbyState = LobbyState.CLOSED;
 
     //Init
-    private Round roundHandler = new Round(this);
-    private Game game = new Game(this, roundHandler);
+    private Round roundHandler;
+    private PlayerHandler playerHandler;
+    private Game game;
 
-    //Flags
+    //Locations
+    private Location loseLocation;
+    private Location tpLocation;
+
+    //Enums
     public enum LobbyState {
+        NONE,
         OPEN,
         CLOSED;
     }
@@ -46,32 +50,67 @@ public class GameController {
     private volatile boolean lobbyJoiningPhase = false;
 
     public enum GameState {
-        //Waiting for running game
         WAITING,
-        RUNNING,
-        //Before starting round - runs Board Animation
+        BEFORE_ROUND,
         COUNTDOWN,
         ROUND_RUNNING,
         ROUND_END,
+        ELIMINATION_PHASE, //TODO
         FINISHED;
     }
-    public GameController() {}
+
+    public GameController() {
+    }
+
+    public void afterRunServer() {
+        transitionLobbyStateTo(LobbyState.NONE);
+        transitionGameStateTo(GameState.FINISHED);
+        init();
+        createLocations();
+        LogUtil.debug("GameController initialized after server start");
+    }
 
     //Open Lobby and setup area
     public void setupLobby(int fieldSize, String type) {
-        transitionLobbyStateTo(GameController.LobbyState.OPEN);
-        transitionGameStateTo(GameController.GameState.WAITING);
+        transitionLobbyStateTo(LobbyState.OPEN);
+        transitionGameStateTo(GameState.WAITING);
+        currentTick = 0;
+        init();
         game.initBoard(fieldSize, type);
-        LogUtil.debug("Lobby is set to: OPEN");
+        createLocations();
+        LogUtil.debug("Lobby is set to: OPEN, field size: " + fieldSize + ", type: " + type);
+    }
+
+    private void init() {
+        roundHandler = new Round(this);
+        playerHandler = new PlayerHandler(this);
+        game = new Game(this, roundHandler, playerHandler);
+        LogUtil.debug("Game components initialized");
+    }
+
+    public void stopLobby() {
+        transitionLobbyStateTo(LobbyState.NONE);
+        transitionGameStateTo(GameState.FINISHED);
+        playerHandler.removeAllPlayers();
+        getGameInstance().cleanup();
+        currentTick = 0;
+        LogUtil.debug("Lobby stopped");
     }
 
     //Prepare to start game
     public boolean prepareToStartGame() {
-        transitionLobbyStateTo(GameController.LobbyState.CLOSED);
-        LogUtil.debug("Lobby is set to: CLOSED");
-        transitionGameStateTo(GameController.GameState.COUNTDOWN);
-        if (players.size() >= MIN_PLAYERS) return false;
+        if (playerHandler.getPlayersList().size() < MIN_PLAYERS) {
+            LogUtil.debug("Cannot start game: not enough players (" +
+                    playerHandler.getPlayersList().size() + "/" + MIN_PLAYERS + ")");
+            return false;
+        }
+
+        currentTick = 0;
         game.runCountdown();
+        transitionLobbyStateTo(LobbyState.CLOSED);
+        LogUtil.debug("Lobby is set to: CLOSED");
+        transitionGameStateTo(GameState.COUNTDOWN);
+        LogUtil.debug("Game countdown started with " + playerHandler.getPlayersList().size() + " players");
         return true;
     }
 
@@ -79,47 +118,71 @@ public class GameController {
     public Round getRoundHandler() {
         return roundHandler;
     }
+
+    //Player Handler
+    public PlayerHandler getPlayerHandler() {
+        return playerHandler;
+    }
+
     //Game instance getter
     public Game getGameInstance() {
         return this.game;
     }
 
     //LobbyState methods
-    public void transitionLobbyStateTo(GameController.LobbyState newState) {
+    public synchronized void transitionLobbyStateTo(LobbyState newState) {
+        LobbyState oldState = this.currentLobbyState;
         this.currentLobbyState = newState;
-        switch(newState) {
+
+        switch (newState) {
             case OPEN -> lobbyJoiningPhase = true;
-            case CLOSED -> lobbyJoiningPhase = false;
+            case CLOSED, NONE -> lobbyJoiningPhase = false;
         }
+
+        LogUtil.debug("Lobby state transition: " + oldState + " -> " + newState);
     }
 
-    public GameController.LobbyState getCurrentLobbyState() {
+    public LobbyState getCurrentLobbyState() {
         return this.currentLobbyState;
     }
 
-    //GameState methods
-    public void transitionGameStateTo(GameController.GameState newState) {
-        this.currentGameState = newState;
-        Bukkit.getServer().getPluginManager().callEvent(new GameStateChangeEvent(newState));
+    public boolean isLobbyJoiningPhase() {
+        return this.lobbyJoiningPhase;
     }
 
-    public GameController.GameState getCurrentGameState() {
+    //GameState methods
+    public synchronized void transitionGameStateTo(GameState newState) {
+        GameState oldState = this.currentGameState;
+        this.currentGameState = newState;
+
+        Bukkit.getServer().getPluginManager().callEvent(new GameStateChangeEvent(newState));
+        LogUtil.debug("Game state transition: " + oldState + " -> " + newState + " (tick: " + currentTick + ")");
+    }
+
+    public GameState getCurrentGameState() {
         return this.currentGameState;
     }
 
-    //Players Handler
-    public void addPlayer(Player p) {
-        players.add(p);
+    //Location methods
+    private void createLocations() {
+        loseLocation = LocationUtil.createLocation(
+                ConfigKey.ARENA_LOSE_POS_X,
+                ConfigKey.ARENA_LOSE_POS_Y,
+                ConfigKey.ARENA_LOSE_POS_Z
+        );
+        tpLocation = LocationUtil.createLocation(
+                ConfigKey.ARENA_TP_POS_X,
+                ConfigKey.ARENA_TP_POS_Y,
+                ConfigKey.ARENA_TP_POS_Z
+        );
+        LogUtil.debug("Locations created - Lose: " + loseLocation + ", TP: " + tpLocation);
     }
 
-    public void removePlayer(Player p) {
-        players.remove(p);
+    public Location getLoseLocation() {
+        return loseLocation;
     }
 
-    //Supporting code methods
-    public Set<Player> getPlayersList() {
-        return this.players;
+    public Location getTpLocation() {
+        return tpLocation;
     }
-
-
 }

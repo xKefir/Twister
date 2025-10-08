@@ -11,9 +11,9 @@ import java.util.*;
 
 public class Blocks {
     private static YamlConfiguration blocks;
-    private static Set<String> keys = new HashSet<>();
-    private static Set<String> types = new HashSet<>();
-    private static Set<String> materials = new HashSet<>();
+    private static List<String> keys = new ArrayList<>();
+    private static List<String> types = new ArrayList<>();
+    private static List<String> materials = new ArrayList<>();
     private static Map<String, String> BLOCKS_KEYS_MAP = new LinkedHashMap<>();
 
     private Blocks() {
@@ -40,7 +40,7 @@ public class Blocks {
         BLOCKS_KEYS_MAP.clear();
     }
 
-    public static Set<String> getAllTypes() {
+    public static List<String> getAllTypes() {
         try {
             for (String key : blocks.getKeys(false)) {
                 types.add(key);
@@ -52,7 +52,7 @@ public class Blocks {
         return null;
     }
 
-    public static Set<String> getTypeElements(String type) {
+    public static List<String> getTypeElements(String type) {
         try {
             for (String element : blocks.getConfigurationSection(type + ".elements").getKeys(false)) {
                 keys.add(element);
@@ -64,7 +64,7 @@ public class Blocks {
         }
         return null;
     }
-    public static Set<String> getMaterialList(String type) {
+    public static List<String> getMaterialList(String type) {
         for (String entry : keys) {
             materials.add(blocks.getString(type + ".elements." + entry));
         }

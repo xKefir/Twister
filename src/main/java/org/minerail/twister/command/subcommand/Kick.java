@@ -11,19 +11,20 @@ import org.bukkit.entity.Player;
 import org.minerail.twister.Twister;
 import org.minerail.twister.file.message.MessageKey;
 import org.minerail.twister.game.core.Game;
-import org.minerail.twister.util.GameUtil;
+import org.minerail.twister.game.core.GameController;
 import org.minerail.twister.util.MessageDeliverUtil;
 
 import static io.papermc.paper.command.brigadier.Commands.argument;
 
 public class Kick implements SubCommand {
+    private GameController controller =  Twister.get().getGameController();
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> get() {
         return Commands.literal("kick")
                 .requires(ctx -> ctx.getSender().hasPermission("tw.admin"))
                 .then(argument("target", StringArgumentType.string())
                         .suggests((context, builder) -> {
-                            Game.players.forEach(player -> builder.suggest(player.getName()));
+                            controller.getPlayerHandler().getPlayersList().forEach(player -> builder.suggest(player.getName()));
                             return builder.buildFuture();
                         })
                         .executes(ctx -> {
@@ -36,9 +37,9 @@ public class Kick implements SubCommand {
 
 
     public int execute(CommandSender sender, String target) {
-        if (GameUtil.isPlayerInGame(Twister.get().getServer().getPlayer(target))) {
+        if (controller.getPlayerHandler().getPlayersList().contains(Twister.get().getServer().getPlayer(sender.getName()))) {
             Player target1 = Twister.get().getServer().getPlayer(target);
-            GameUtil.removePlayer(target1);
+            controller.getPlayerHandler().eliminatePlayer(target1);
             MessageDeliverUtil.sendWithPrefix(target1, MessageKey.MESSAGES_COMMAND_KICK_TO_TARGETED_PLAYER);
 
             MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_KICK_TO_SENDER,

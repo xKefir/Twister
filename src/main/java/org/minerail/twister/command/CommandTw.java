@@ -1,21 +1,19 @@
 package org.minerail.twister.command;
 
-
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.minerail.twister.Twister;
 import org.minerail.twister.command.subcommand.*;
 import org.minerail.twister.file.message.MessageKey;
-import org.minerail.twister.game.core.Game;
-import org.minerail.twister.util.GameUtil;
-import org.minerail.twister.util.TextFormatUtil;
+import org.minerail.twister.game.core.GameController;
+import org.minerail.twister.util.MessageDeliverUtil;
 
 import java.util.List;
 
 public class CommandTw {
 
+    private GameController controller =  Twister.get().getGameController();
 
     @SuppressWarnings("Invalid api usage.")
     public void register(Commands cmds) {
@@ -32,38 +30,31 @@ public class CommandTw {
                .then(new Start().get())
                .then(new Stop().get())
                .then(new Teleport().get())
-               .then(new Top().get())
+//               .then(new Top().get())
                .then(new Kick().get())
                .build(), null, List.of("tw")
        );
     }
-    private int execute(CommandSender sender) {
+    public int execute(CommandSender sender) {
         Player p = Twister.get().getServer().getPlayer(sender.getName());
-        if (!GameUtil.isPlayerInGame(p)) {
-            if (Game.canJoin) {
-                GameUtil.addPlayer(p);
-                sender.sendMessage(TextFormatUtil.fromMessages(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_JOINED,
-                        Placeholder.component("prefix", TextFormatUtil.fromMessages(MessageKey.MESSAGES_PREFIX_STRING)))
-                );
-                return 1;
-            } else if (Game.gameStarted) {
-                sender.sendMessage(TextFormatUtil.fromMessages(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_GAME_ALREADY_STARTED,
-                        Placeholder.component("prefix", TextFormatUtil.fromMessages(MessageKey.MESSAGES_PREFIX_STRING)))
-                );
-                return 1;
-            } else {
-                sender.sendMessage(TextFormatUtil.fromMessages(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_EVENT_NOT_STARTED,
-                        Placeholder.component("prefix", TextFormatUtil.fromMessages(MessageKey.MESSAGES_PREFIX_STRING)))
-                );
-                return 1;
 
-            }
-        } else {
-            p.sendMessage(TextFormatUtil.fromMessages(MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_PLAYER_IS_ALREADY_IN_GAME,
-                    Placeholder.component("prefix", TextFormatUtil.fromMessages(MessageKey.MESSAGES_PREFIX_STRING))));
+        if (controller.getCurrentLobbyState() == GameController.LobbyState.CLOSED) {
+            MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_GAME_ALREADY_STARTED);
             return 1;
         }
 
+        if (controller.getCurrentLobbyState() == GameController.LobbyState.NONE) {
+            MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_EVENT_NOT_STARTED);
+            return 1;
+        }
+
+        if (controller.getPlayerHandler().addPlayer(p)) {
+            MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_JOINED);
+        } else {
+            MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_WITHOUT_ARGS_PLAYER_IS_ALREADY_IN_GAME);
+        }
+        return 1;
     }
+
 }
 

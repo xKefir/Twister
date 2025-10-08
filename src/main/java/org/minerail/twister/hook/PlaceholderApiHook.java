@@ -5,9 +5,6 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.minerail.twister.Twister;
 import org.minerail.twister.file.playerdata.PlayerData;
-import org.minerail.twister.util.GameUtil;
-
-import java.util.Objects;
 
 public class PlaceholderApiHook extends PlaceholderExpansion {
     private final Twister plugin;
@@ -43,7 +40,7 @@ public class PlaceholderApiHook extends PlaceholderExpansion {
             case "wins" -> String.valueOf(PlayerData.get(player.getPlayer()).getPlayerStats().getWins());
             case "loses" -> String.valueOf(PlayerData.get(player.getPlayer()).getPlayerStats().getLosses());
             case "totalPlayed" -> String.valueOf(PlayerData.get(player.getPlayer()).getPlayerStats().getGamesPlayed());
-            case "last_winner" -> (GameUtil.getWinningPlayer() != null) ? GameUtil.getWinningPlayer().getName() : "null";
+           // case "last_winner" -> (GameUtil.getWinningPlayer() != null) ? GameUtil.getWinningPlayer().getName() : "null";
             default -> null;
         };
     }

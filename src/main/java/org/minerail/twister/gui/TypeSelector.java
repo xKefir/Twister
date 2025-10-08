@@ -22,8 +22,8 @@ public class TypeSelector {
 
     private void createGui() {
         gui = Gui.gui()
-                .title(TextFormatUtil.format(Twister.getConfigFile().getString(ConfigKey.SETTINGS_GUI_TITLE)))
-                .rows(Twister.getConfigFile().getInt(ConfigKey.SETTINGS_GUI_SIZE))
+                .title(TextFormatUtil.format(Twister.get().getConfigFile().getString(ConfigKey.SETTINGS_GUI_TITLE)))
+                .rows(Twister.get().getConfigFile().getInt(ConfigKey.SETTINGS_GUI_SIZE))
                 .create();
     }
 

@@ -14,6 +14,8 @@ public class Board {
     private final int y;
     private final int fieldSize;
     private final List<Material> materials;
+    public boolean areaCleared = false;
+    private List<Material> materialList = new ArrayList<>();
 
     public Board(Location minCorner, Location maxCorner, int y, int fieldSize, Set<String> materials) {
         this.world = minCorner.getWorld();
@@ -23,10 +25,11 @@ public class Board {
         this.minCorner = minCorner;
         this.maxCorner = maxCorner;
     }
+
     private final Random RANDOM = new Random();
 
     private List<Material> convertToMaterialList(Set<String> materialKeys) {
-        List<Material> materialList = new ArrayList<>();
+        materialList.clear();
         for (String key : materialKeys) {
             Material material = Material.getMaterial(key);
             if (material != null) {
@@ -79,6 +82,7 @@ public class Board {
                 block.setType(Material.AIR);
             }
         });
+        areaCleared = true;
     }
 
     public void clearArena() {

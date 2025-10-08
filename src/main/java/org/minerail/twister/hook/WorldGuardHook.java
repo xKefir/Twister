@@ -20,7 +20,7 @@ import java.util.Set;
 
 public class WorldGuardHook {
     private static WorldGuardHook instance;
-    private final ConfigFile config = Twister.getConfigFile();
+    private final ConfigFile config = Twister.get().getConfigFile();
 
     private WorldGuardHook() {}
 
@@ -87,11 +87,10 @@ public class WorldGuardHook {
         // Iteruj przez wszystkich graczy online
         for (Player player : Bukkit.getOnlinePlayers()) {
             try {
-                if (isPlayerInRegions(player, targetRegions)) {
+                if (PlayerIsInRegion(player, targetRegions)) {
                     playersInRegion.add(player);
                 }
             } catch (Exception e) {
-                // Pomiń gracza przy błędzie, nie crashuj całej metody
                 continue;
             }
         }
@@ -99,7 +98,7 @@ public class WorldGuardHook {
         return playersInRegion;
     }
 
-    private boolean isPlayerInRegions(Player player, Set<String> regionNames) {
+    private boolean PlayerIsInRegion(Player player, Set<String> regionNames) {
         ApplicableRegionSet regions = getApplicableRegions(player);
         if (regions == null) {
             return false;

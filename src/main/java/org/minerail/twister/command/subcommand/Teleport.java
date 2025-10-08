@@ -3,15 +3,15 @@ package org.minerail.twister.command.subcommand;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.minerail.twister.Twister;
 import org.minerail.twister.file.message.MessageKey;
-import org.minerail.twister.util.GameUtil;
+import org.minerail.twister.game.core.GameController;
 import org.minerail.twister.util.MessageDeliverUtil;
-import org.minerail.twister.util.TextFormatUtil;
 
 public class Teleport implements SubCommand {
+    private final GameController controller = Twister.get().getGameController();
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> get() {
         return Commands.literal("tp")
@@ -20,7 +20,7 @@ public class Teleport implements SubCommand {
     }
 
     public int execute(CommandSender sender) {
-        GameUtil.teleportToArena((Player) sender);
+        Twister.get().getServer().getPlayer(sender.getName()).teleport(controller.getTpLocation());
         MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_TP_TO_SENDER);
         return 1;
     }

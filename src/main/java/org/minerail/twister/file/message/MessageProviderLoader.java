@@ -46,14 +46,14 @@ public class MessageProviderLoader {
 
     public List<String> getStringList(String path) {
         List<String> result = messages.getStringList(path);
-        if (result.isEmpty() && !messages.isList(path)) {
+        if (!result.isEmpty() && !messages.isList(path)) {
             LogUtil.warn("Missing message list at path: " + path);
             return List.of("Missing message list: " + path);
         }
         return new ArrayList<>(result);
     }
 
-    // HELPER METHODS dla systemu leaderboard
+    //Supporting methods
     public ConfigurationSection getConfigurationSection(String path) {
         ConfigurationSection section = messages.getConfigurationSection(path);
         if (section == null) {
@@ -67,16 +67,16 @@ public class MessageProviderLoader {
         return section != null ? section.getKeys(false) : Set.of();
     }
 
-    // STATIC HELPER METHODS - dla wygody
+    // STATIC SUPPORTING METHODS
     public static String getStaticString(String path) {
-        return Twister.getMessages().getString(path);
+        return Twister.get().getMessages().getString(path);
     }
 
     public static List<String> getStaticStringList(String path) {
-        return Twister.getMessages().getStringList(path);
+        return Twister.get().getMessages().getStringList(path);
     }
 
     public static ConfigurationSection getStaticConfigurationSection(String path) {
-        return Twister.getMessages().getConfigurationSection(path);
+        return Twister.get().getMessages().getConfigurationSection(path);
     }
 }

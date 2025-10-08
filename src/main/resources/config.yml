@@ -9,7 +9,7 @@ Settings:
       items:
         type: BLUE_STAINED_GLASS_PANE
         show-amounts: true
-  Hook:
+  Hook: #Soon
     WorldGuard:
       enabled: true
       take-players-inventory: true
@@ -22,7 +22,11 @@ Settings:
     min-players: 2
     max-field-size: 9
 
+#Arena options:
+#DEFAULT = Default mixed flat area
+#VARIATED_Y = Flat-looking arena with bumps or dips (±1 Y) in (for example: 3x3) block sections
 Arena:
+  type: DEFAULT #Not implemented
   world: "Your world name"
   pos1:
     x:

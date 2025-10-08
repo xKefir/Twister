@@ -6,51 +6,81 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.minerail.twister.Twister;
 import org.minerail.twister.game.core.GameController;
+import org.minerail.twister.util.LogUtil;
 
 public class HotbarAnimation implements Animation<Long> {
-    private GameController controller = Twister.getGameController();
-    private Runnable nextction;
+    private GameController controller = Twister.get().getGameController();
+    private Runnable nextAction;
     private BukkitTask animTask;
-    private long animStartTime;
-    long currentGoal;
-    long amountToAdd;
+    private long localTickCounter;
+    private long currentGoalTick;
+    private long ticksToAdd;
+    public boolean animationRunning = false;
 
     @Override
-    public Animation start(Long param) {
-        animStartTime = controller.currentTime;
-        currentGoal = (long) (param * controller.MATERIAL_SELECTION_DELAY * 1);
-        amountToAdd = currentGoal;
+    public Animation start(Long durationTicks) {
+        animationRunning = true;
+        localTickCounter = 0;
+
+        ticksToAdd = (long) (durationTicks * controller.MATERIAL_SELECTION_DELAY);
+        currentGoalTick = ticksToAdd;
+
+        LogUtil.debug("HotbarAnimation started, duration: " + durationTicks + " ticks, " +
+                "change interval: " + ticksToAdd + " ticks");
+
         animTask = Bukkit.getScheduler().runTaskTimer(Twister.get(), () -> {
-            long elapsedTime = controller.currentTime - animStartTime;
-            if (elapsedTime >= param) stop();
-            if (elapsedTime >= currentGoal) {
-                ItemStack item = new ItemStack(controller.getGameInstance().board.getRandomMaterial());
-                for (Player p : controller.getPlayersList()) {
+            localTickCounter++;
+
+            if (localTickCounter >= durationTicks) {
+                LogUtil.debug("HotbarAnimation completed after " + localTickCounter + " ticks");
+                stop();
+                animationRunning = false;
+                if (nextAction != null) {
+                    LogUtil.debug("Calling HotbarAnimation callback");
+                    nextAction.run();
+                } else {
+                    LogUtil.debug("WARNING: HotbarAnimation nextAction is NULL!");
+                }
+                return;
+            }
+
+            if (localTickCounter >= currentGoalTick) {
+                ItemStack item = new ItemStack(
+                        controller.getGameInstance().board.getRandomMaterial()
+                );
+
+                for (Player p : controller.getPlayerHandler().getPlayersList()) {
                     for (int i = 0; i < 9; i++) {
                         p.getInventory().setItem(i, item);
                     }
                 }
-                this.currentGoal += amountToAdd;
+
+                currentGoalTick += ticksToAdd;
+                LogUtil.debug("HotbarAnimation changed item at tick " + localTickCounter);
             }
         }, 0, 1L);
+
         return this;
     }
 
     @Override
     public void stop() {
-        animTask.cancel();
-        animTask = null;
-        animStartTime = 0;
+        if (animTask != null && !animTask.isCancelled()) {
+            animTask.cancel();
+        }
+        animationRunning = false;
+        localTickCounter = 0;
+        currentGoalTick = 0;
     }
 
     @Override
     public boolean isRunning() {
-        return animTask != null;
+        return animationRunning;
     }
 
     @Override
     public Animation then(Runnable nextAction) {
-        this.nextction = nextAction;
+        this.nextAction = nextAction;
         return this;
     }
 }

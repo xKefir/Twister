@@ -2,6 +2,7 @@ package org.minerail.twister.event;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import org.minerail.twister.game.core.GameController;
 
 public class GameStateChangeEvent extends Event {
@@ -15,9 +16,13 @@ public class GameStateChangeEvent extends Event {
         return this.state;
     }
 
+
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
 }

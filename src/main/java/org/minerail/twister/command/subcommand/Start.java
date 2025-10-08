@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.minerail.twister.Twister;
 import org.minerail.twister.file.Blocks;
 import org.minerail.twister.file.config.ConfigKey;
@@ -23,9 +24,9 @@ import static io.papermc.paper.command.brigadier.Commands.argument;
 
 public class Start implements SubCommand {
 
-    private static int num = 0;
-    private static String executor;
-    private final GameController controller = Twister.getGameController();
+    public static int num = 0;
+    public static String executor;
+    private final GameController controller = Twister.get().getGameController();
 
     @Override
     public LiteralArgumentBuilder<CommandSourceStack> get() {
@@ -59,7 +60,7 @@ public class Start implements SubCommand {
     }
 
     public int execute(CommandSender sender, int i, String type) throws InterruptedException {
-        if (Twister.getConfigFile().getBoolean(ConfigKey.SETTINGS_GUI_MODULE_ENABLED) && num != 1) {
+        if (Twister.get().getConfigFile().getBoolean(ConfigKey.SETTINGS_GUI_MODULE_ENABLED) && num != 1) {
             new TypeSelector(Bukkit.getPlayer(sender.getName()));
             executor = sender.getName();
             return 1;
@@ -77,8 +78,9 @@ public class Start implements SubCommand {
     }
 
     private void firstTime(CommandSender sender, int fieldSize, String type) {
-        if (fieldSize <= Twister.getConfigFile().getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE)) {
-            Game.runLobby(fieldSize, type);
+        if (fieldSize <= Twister.get().getConfigFile().getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE)) {
+            controller.setupLobby(fieldSize, type);
+            controller.getPlayerHandler().addPlayer((Player) sender);
             num = 1;
 
             MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_START_FIRST_TIME_TO_SENDER,
@@ -89,7 +91,7 @@ public class Start implements SubCommand {
             executor = sender.getName();
         } else {
             MessageDeliverUtil.sendWithPrefix(sender, MessageKey.MESSAGES_COMMAND_START_FIELD_SIZE_TOO_LARGE,
-                    Placeholder.component("poolsize", Component.text(Twister.getConfigFile().getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE))));
+                    Placeholder.component("poolsize", Component.text(Twister.get().getConfigFile().getInt(ConfigKey.SETTINGS_GAME_MAX_FIELD_SIZE))));
         }
     }
 

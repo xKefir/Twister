@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class MessageDeliverUtil {
 
-    // PODSTAWOWE METODY
+    // Basic methods
     public static void send(CommandSender target, MessageKey key, TagResolver... resolvers) {
         Component msg = TextFormatUtil.fromMessages(key, resolvers);
         target.sendMessage(msg);
@@ -38,8 +38,12 @@ public class MessageDeliverUtil {
         Bukkit.broadcast(msg);
     }
 
-    // METODY Z AUTOMATYCZNYM PREFIXEM - najczęściej używane
+    // Methods using prefix
     public static void sendWithPrefix(CommandSender target, MessageKey key, TagResolver... resolvers) {
+        Component msg = TextFormatUtil.withPrefix(key, resolvers);
+        target.sendMessage(msg);
+    }
+    public static void sendWithPrefix(Player target, MessageKey key, TagResolver... resolvers) {
         Component msg = TextFormatUtil.withPrefix(key, resolvers);
         target.sendMessage(msg);
     }
@@ -62,8 +66,8 @@ public class MessageDeliverUtil {
     }
 
     public static void sendToListOfPlayersWithPrefix(Set<Player> players, MessageKey key, TagResolver... resolvers) {
-        if (!WorldGuardHook.getInstance().getPlayersInRegion(Twister.getConfigFile().getString(ConfigKey.SETTINGS_HOOK_WORLDGUARD_GAME_REGION)).isEmpty()) {
-            for (Player p : WorldGuardHook.getInstance().getPlayersInRegion(Twister.getConfigFile().getString(ConfigKey.SETTINGS_HOOK_WORLDGUARD_GAME_REGION))) {
+        if (!WorldGuardHook.getInstance().getPlayersInRegion(Twister.get().getConfigFile().getString(ConfigKey.SETTINGS_HOOK_WORLDGUARD_GAME_REGION)).isEmpty()) {
+            for (Player p : WorldGuardHook.getInstance().getPlayersInRegion(Twister.get().getConfigFile().getString(ConfigKey.SETTINGS_HOOK_WORLDGUARD_GAME_REGION))) {
                 sendWithPrefix(p, key, resolvers);
             }
         } else {

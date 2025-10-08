@@ -7,7 +7,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.minerail.twister.Twister;
-import org.minerail.twister.file.leaderboard.Leaderboard;
 import org.minerail.twister.file.message.MessageKey;
 
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ import java.util.List;
 public class TextFormatUtil {
 
     public static Component format(String input, TagResolver... resolvers) {
-        if (Twister.getMessages().getString(MessageKey.MESSAGES_INPUT_TYPE.getPath()).equals("LEGACY")) {
+        if (Twister.get().getMessages().getString(MessageKey.MESSAGES_INPUT_TYPE.getPath()).equals("LEGACY")) {
             return LegacyComponentSerializer.legacyAmpersand().deserialize(
                     LegacyComponentSerializer.legacyAmpersand().serialize(
                             MiniMessage.builder().build().deserialize(input, resolvers))).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
@@ -26,38 +25,27 @@ public class TextFormatUtil {
 
     public static List<Component> format(List<String> input, TagResolver... resolvers) {
         List<Component> formattedComponent = new ArrayList<>();
-        input.forEach(str -> {
-            Component formatted = format(str, resolvers);
+        for (String str : input) {
+            Component formatted = format(str, resolvers); // Przekazuj resolvers do każdego elementu
             formattedComponent.add(formatted);
-        });
+        }
         return formattedComponent;
     }
 
-    public static List<Component> formatTopList(List<Leaderboard.TopEntry> entries) {
-        List<Component> components = new ArrayList<>();
-        int pos = 1;
-
-        for (Leaderboard.TopEntry entry : entries) {
-            components.add(format(
-                    Twister.getMessages().getString(MessageKey.MESSAGES_COMMAND_TOP_LISTLINE.getPath()),
-                    prefixPlaceholder(),
-                    Placeholder.component("pos", Component.text(pos)),
-                    Placeholder.component("player", Component.text(entry.getPlayerName())),
-                    Placeholder.component("value", Component.text(entry.getValue()))
-            ));
-            if (pos == entries.size()) break;
-            pos++;
-        }
-
-        return components;
-    }
-
     public static Component fromMessages(MessageKey key, TagResolver... resolvers) {
-        return format(Twister.getMessages().getString(key.getPath()), resolvers);
+        String message = Twister.get().getMessages().getString(key.getPath());
+        if (message == null) {
+            return Component.text("Missing message: " + key.getPath());
+        }
+        return format(message, resolvers);
     }
 
     public static List<Component> fromMessagesList(MessageKey key, TagResolver... resolvers) {
-        return format(Twister.getMessages().getStringList(key.getPath()), resolvers);
+        List<String> messages = Twister.get().getMessages().getStringList(key.getPath());
+        if (messages == null || messages.isEmpty()) {
+            return List.of(Component.text("Missing message list: " + key.getPath()));
+        }
+        return format(messages, resolvers);
     }
 
     // HELPER METHODS - żeby nie powtarzać kodu

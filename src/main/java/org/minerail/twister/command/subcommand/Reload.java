@@ -22,7 +22,7 @@ public class Reload implements SubCommand {
     public int execute(CommandSender sender) {
         try {
             MessageDeliverUtil.sendWithPrefix(sender,MessageKey.MESSAGES_COMMAND_RELOAD_SUCCESS);
-            Twister.reloadAll();
+            Twister.get().reloadAll();
             return 1;
         } catch (Exception e) {
             MessageDeliverUtil.sendWithPrefix(sender,MessageKey.MESSAGES_COMMAND_RELOAD_ERROR);

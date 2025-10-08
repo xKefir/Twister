@@ -5,46 +5,74 @@ import org.bukkit.scheduler.BukkitTask;
 import org.minerail.twister.Twister;
 import org.minerail.twister.game.board.Board;
 import org.minerail.twister.game.core.GameController;
+import org.minerail.twister.util.LogUtil;
 
 public class BoardAnimation implements Animation<Board> {
-    private GameController controller = Twister.getGameController();
-    private Runnable nextction;
+    private GameController controller = Twister.get().getGameController();
+    private Runnable nextAction;
     private BukkitTask animTask;
-    private long animStartTime;
-    long currentGoal;
-    long amountToAdd;
+    private long localTickCounter;
+    private long currentGoalTick;
+    private long ticksToAdd;
+    public boolean animationRunning = false;
 
     @Override
     public Animation start(Board param) {
-        animStartTime = controller.currentTime;
-        currentGoal = (long) (controller.AREA_ANIM_TIME * 0.20 * 1);
-        amountToAdd = currentGoal;
+        animationRunning = true;
+        localTickCounter = 0;
+
+        ticksToAdd = (long) (controller.AREA_ANIM_TIME * 0.20);
+        currentGoalTick = ticksToAdd;
+
+        LogUtil.debug("BoardAnimation started, duration: " + controller.AREA_ANIM_TIME + " ticks, " +
+                "step interval: " + ticksToAdd + " ticks");
+
         animTask = Bukkit.getScheduler().runTaskTimer(Twister.get(), () -> {
-            long elapsedTime = controller.currentTime - animStartTime;
-            if (elapsedTime >= controller.AREA_ANIM_TIME) stop();
-            if (elapsedTime >= currentGoal) {
-                param.fillAreasWithMaterials();
-                currentGoal += amountToAdd;
+            localTickCounter++;
+
+            // Zakończ animację
+            if (localTickCounter >= controller.AREA_ANIM_TIME) {
+                LogUtil.debug("BoardAnimation completed after " + localTickCounter + " ticks");
+                stop();
+                animationRunning = false;
+                if (nextAction != null) {
+                    LogUtil.debug("Calling BoardAnimation callback");
+                    nextAction.run();
+                } else {
+                    LogUtil.debug("WARNING: BoardAnimation nextAction is NULL!");
+                }
+                return;
             }
-        },0,1L);
+
+            // Wykonaj krok animacji
+            if (localTickCounter >= currentGoalTick) {
+                param.fillAreasWithMaterials();
+                currentGoalTick += ticksToAdd;
+                LogUtil.debug("BoardAnimation step at tick " + localTickCounter);
+            }
+        }, 0, 1L);
+
         return this;
     }
 
     @Override
     public void stop() {
-        animTask.cancel();
-        animTask = null;
-        animStartTime = 0;
+        if (animTask != null && !animTask.isCancelled()) {
+            animTask.cancel();
+        }
+        animationRunning = false;
+        localTickCounter = 0;
+        currentGoalTick = 0;
     }
 
     @Override
     public boolean isRunning() {
-        return animTask != null;
+        return animationRunning;
     }
 
     @Override
     public Animation then(Runnable nextAction) {
-        this.nextction = nextAction;
+        this.nextAction = nextAction;
         return this;
     }
 }

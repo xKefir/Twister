@@ -5,9 +5,6 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.minerail.twister.Twister;
-import org.minerail.twister.file.leaderboard.Leaderboard;
-import org.minerail.twister.file.leaderboard.LeaderboardHandler;
 import org.minerail.twister.util.LocationUtil;
 import org.minerail.twister.util.LogUtil;
 
@@ -16,7 +13,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class PlayerData {
-    private static final Map<UUID, PlayerData> PLAYER_DATA_MAP = new HashMap<>();
+    private static Map<UUID, PlayerData> PLAYER_DATA_MAP = new HashMap<>();
     private final UUID playerUUID;
     private final String playerName;
     private final Player player;
@@ -24,8 +21,6 @@ public class PlayerData {
     protected YamlConfiguration data;
     private File playerFile;
 
-    private static Leaderboard leaderboard;
-    private static LeaderboardHandler leaderboardHandler;
 
     private PlayerData(Player player) {
         this.playerUUID = player.getUniqueId();
@@ -52,26 +47,14 @@ public class PlayerData {
         data.set("name", player.getName());
         loadPlayerStats();
 
-        if (leaderboard != null) {
-            syncToLeaderboard();
+    }
+
+
+    public static PlayerData get(Player p) {
+        if (!PLAYER_DATA_MAP.containsKey(p.getUniqueId())) {
+            return new PlayerData(p);
         }
-    }
-
-    public static void initLeaderboardIntegration(Leaderboard leaderboardInstance) {
-        leaderboard = leaderboardInstance;
-        leaderboardHandler = new LeaderboardHandler(leaderboard);
-        LogUtil.debug("Inicjalizacja integracji PlayerData z systemem rankingowym zakończona");
-    }
-
-    public static LeaderboardHandler getLeaderboardHandler() {
-        return leaderboardHandler;
-    }
-
-    public static PlayerData get(Player player) {
-        if (!PLAYER_DATA_MAP.containsKey(player.getUniqueId())) {
-            return new PlayerData(player);
-        }
-        return PLAYER_DATA_MAP.get(player.getUniqueId());
+        return PLAYER_DATA_MAP.get(p.getUniqueId());
     }
 
     public void save() {
@@ -94,12 +77,6 @@ public class PlayerData {
             }
         }
 
-        // Synchronizacja wszystkich graczy z leaderboardem
-        syncAllToLeaderboard();
-
-        if (leaderboard != null) {
-            leaderboard.save();
-        }
 
         LogUtil.debug("Saved all player data (" + PLAYER_DATA_MAP.size() + " players).");
     }
@@ -129,105 +106,7 @@ public class PlayerData {
         return this.stats;
     }
 
-    // POPRAWIONA METODA synchronizacji z leaderboardem
-    public void syncToLeaderboard() {
-        if (leaderboard == null) {
-            LogUtil.debug("Leaderboard not initialized, skipping sync for " + playerName);
-            return;
-        }
 
-        if (stats == null) {
-            LogUtil.warn("PlayerStats is null for " + playerName + ", cannot sync to leaderboard");
-            return;
-        }
-
-        try {
-            // Użyj bezpośredniej synchronizacji ze statystyk gracza
-            leaderboard.updateFromPlayerStats(
-                    playerName,
-                    stats.getWins(),
-                    stats.getLosses(),
-                    stats.getGamesPlayed()
-            );
-
-            LogUtil.debug("Successfully synced " + playerName + " to leaderboard: W:" +
-                    stats.getWins() + " L:" + stats.getLosses() + " T:" + stats.getGamesPlayed());
-
-        } catch (Exception e) {
-            LogUtil.error("Error syncing " + playerName + " to leaderboard: " + e.getMessage());
-
-            // Fallback - spróbuj z PlaceholderAPI jeśli bezpośrednia synchronizacja nie działa
-            if (player != null && player.isOnline()) {
-                try {
-                    leaderboard.updateFromPlaceholderAPI(player);
-                    LogUtil.debug("Fallback PlaceholderAPI sync successful for " + playerName);
-                } catch (Exception e2) {
-                    LogUtil.error("Fallback PlaceholderAPI sync also failed for " + playerName + ": " + e2.getMessage());
-                }
-            }
-        }
-    }
-
-    // Metoda do synchronizacji wszystkich graczy (statyczna)
-    public static void syncAllToLeaderboard() {
-        if (leaderboard == null) {
-            LogUtil.debug("Leaderboard not initialized, skipping sync for all players");
-            return;
-        }
-
-        LogUtil.debug("Starting leaderboard sync for all players (" + PLAYER_DATA_MAP.size() + " players)");
-
-        int successCount = 0;
-        int errorCount = 0;
-
-        for (PlayerData pd : PLAYER_DATA_MAP.values()) {
-            try {
-                pd.syncToLeaderboard();
-                successCount++;
-            } catch (Exception e) {
-                LogUtil.error("Error syncing player " + pd.playerName + " to leaderboard: " + e.getMessage());
-                errorCount++;
-            }
-        }
-
-        LogUtil.debug("Leaderboard sync completed: " + successCount + " successful, " + errorCount + " errors");
-
-    }
-
-    // NOWE METODY do aktualizacji statystyk z automatyczną synchronizacją
-    public void addWin() {
-        if (stats != null) {
-            stats.addWin();
-            syncToLeaderboard();
-            LogUtil.debug("Added win for " + playerName + " (now: " + stats.getWins() + ")");
-        }
-    }
-
-    public void addLoss() {
-        if (stats != null) {
-            stats.addLoss();
-            syncToLeaderboard();
-            LogUtil.debug("Added loss for " + playerName + " (now: " + stats.getLosses() + ")");
-        }
-    }
-
-    public void addGamePlayed() {
-        if (stats != null) {
-            stats.addGamesPlayed();
-            syncToLeaderboard();
-            LogUtil.debug("Added game played for " + playerName + " (now: " + stats.getGamesPlayed() + ")");
-        }
-    }
-
-    // Metoda do manualnego odświeżenia statystyk z PlaceholderAPI
-    public void refreshFromPlaceholderAPI() {
-        if (leaderboard != null && player != null && player.isOnline()) {
-            leaderboard.updateFromPlaceholderAPI(player);
-            LogUtil.debug("Refreshed " + playerName + " stats from PlaceholderAPI");
-        }
-    }
-
-    // Pozostałe metody bez zmian...
     public void savePlayerInventory(ItemStack[] itemStacks, float exp, int level) {
         for (int i = 0; i < itemStacks.length; i++) {
             if (itemStacks[i] != null) {
@@ -264,7 +143,7 @@ public class PlayerData {
         data.set("inventory.experience", null);
     }
 
-    public void deserializeAndSavePlayerLocation(Location loc) {
+    public void deserializeAndSavePlayerLastLocation(Location loc) {
         double x = loc.getBlockX();
         double y = loc.getBlockY();
         double z = loc.getBlockZ();
@@ -275,23 +154,16 @@ public class PlayerData {
         data.set("last-location.world", world.getName());
     }
 
-    public Location getPlayerJoinLocationFromData() {
+    public Location getPlayerLastLocationFromData() {
         return LocationUtil.serializeLocation(
                 data.getDouble("last-location.x"),
                 data.getDouble("last-location.y"),
                 data.getDouble("last-location.z"),
                 data.getString("last-location.world"));
     }
-
     public Player getPlayer() {
         return player;
     }
-
-    public UUID getPlayerUUID() {
-        return playerUUID;
-    }
-
-    public String getPlayerName() {
-        return playerName;
-    }
+    public UUID getPlayerUUID() { return playerUUID; }
+    public String getPlayerName() { return playerName; }
 }

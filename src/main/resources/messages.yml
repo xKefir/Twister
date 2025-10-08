@@ -12,13 +12,13 @@ Messages:
       player-is-already-in-game: '<prefix>&cJesteś już w grze.'
       game-already-started: '<prefix>&cGra się już rozpoczęła!'
     help:
-      - '<prefix>&6Ostatni zwyciężca: &3<lastwinner>'
+      #- '<prefix>&6Ostatni zwyciężca: &3<lastwinner>'
       - '<prefix>&2/tw start [wielkość pól lub random] [typ bloku] &a- Uruchomienie eventu; Wpisz ponownie aby rozpocząć grę.'
       - '<prefix>&2/tw stop &a- Zatrzymanie eventu oraz wyrzucenie wszystkich uczesnitków.'
       - '<prefix>&2/tw tp &a- Teleportacja na arene.'
       - '<prefix>&2/tw leave &a- Wyjście z eventu.'
       - '<prefix>&2/tw kick [nick] &a- Wyrzucenie gracza z eventu.'
-      - '<prefix>&2/tw top &a- Wyświetla top 10 graczy.'
+      #- '<prefix>&2/tw top &a- Wyświetla top 10 graczy.'
       - '<prefix>&2/tw reload &a- Przeładowuje plugin.'
     start:
       first-time-to-sender: '<prefix>&aRozpoczęto wydarzenie. Rozmiar: &c<poolsize> &aTyp: &c<type>'

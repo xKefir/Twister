@@ -19,6 +19,8 @@ public enum ConfigKey {
     SETTINGS_GAME_MIN_PLAYERS("Settings.Game.min-players"),
     SETTINGS_GAME_MAX_FIELD_SIZE("Settings.Game.max-field-size"),
 
+    ARENA_TYPE("Arena.type"), //Not implemented
+
     ARENA_WORLD("Arena.world"),
 
     ARENA_POS1_X("Arena.pos1.x"),

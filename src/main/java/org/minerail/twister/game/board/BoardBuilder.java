@@ -15,12 +15,16 @@ public class BoardBuilder {
     private Set<String> materials = new HashSet<>();
 
     public BoardBuilder setCorners() {
-        // logika min/max jak wcześniej
         int minX = Math.min(minCorner.getBlockX(), maxCorner.getBlockX());
         int maxX = Math.max(minCorner.getBlockX(), maxCorner.getBlockX());
         int minZ = Math.min(minCorner.getBlockZ(), maxCorner.getBlockZ());
         int maxZ = Math.max(minCorner.getBlockZ(), maxCorner.getBlockZ());
         World world = minCorner.getWorld();
+
+        this.minCorner.setX(minX);
+        this.minCorner.setZ(minZ);
+        this.maxCorner.setX(maxX);
+        this.maxCorner.setZ(maxZ);
 
         this.y = minCorner.getBlockY();
         return this;
